@@ -504,7 +504,16 @@ class CallAudioService: IndividualCallObserver, GroupCallObserver {
             Logger.info("AVAudioSession changed from [category: \(oldCategory.rawValue), mode: \(oldMode.rawValue), options: \(oldOptions)] to [category: \(category.rawValue), mode: \(mode.rawValue), options: \(options)]")
         } catch {
             let message = "AVAudioSession failed to change from [category: \(oldCategory.rawValue), mode: \(oldMode.rawValue), options: \(oldOptions)] to [category: \(category.rawValue), mode: \(mode.rawValue), options: \(options)] with error: \(error)"
-            owsFailDebug(message)
+            if #available(iOS 26, *), MainActor.assumeIsolated({ VoiceCommandService.shared.releaseCallAudio() }) {
+                do {
+                    try avAudioSession.setCategory(category, mode: mode, options: options)
+                    Logger.warn("\(message); succeeded after voice commands released the microphone")
+                } catch {
+                    owsFailDebug("\(message); retry failed: \(error)")
+                }
+            } else {
+                owsFailDebug(message)
+            }
         }
 
         self.delegate?.callAudioServiceDidChangeAudioSession(self)

@@ -15,6 +15,7 @@ protocol AttachmentFormatPickerDelegate: AnyObject {
     func didTapLocation()
     func didTapPayment()
     func didTapPoll()
+    func didTapDictate()
 }
 
 class AttachmentFormatPickerView: UIView {
@@ -74,6 +75,8 @@ class AttachmentFormatPickerView: UIView {
                 delegate.didTapLocation()
             case .poll:
                 delegate.didTapPoll()
+            case .dictate:
+                delegate.didTapDictate()
             }
         }
     }
@@ -178,6 +181,7 @@ class AttachmentFormatPickerView: UIView {
         case photo
         case gif
         case file
+        case dictate
         case poll
         case contact
         case location
@@ -200,6 +204,7 @@ class AttachmentFormatPickerView: UIView {
             let showGifSearch = RemoteConfig.current.enableGifSearch
             return allCases.filter { (value: AttachmentType) in
                 if value == .gif, !showGifSearch { return false }
+                if value == .dictate, !AutoSTTSettings.isActive { return false }
                 return !except.contains(value)
             }
         }
@@ -344,10 +349,15 @@ class AttachmentFormatPickerView: UIView {
             case .poll:
                 text = OWSLocalizedString("ATTACHMENT_KEYBOARD_POLL", comment: "A button to select a poll from the Attachment Keyboard")
                 imageName = "poll-28"
+            case .dictate:
+                text = OWSLocalizedString("ATTACHMENT_KEYBOARD_DICTATE", comment: "A button to start on-device dictation from the Attachment Keyboard")
+                imageName = "waveform.and.mic"
             }
 
             textLabel.text = text
-            button.configuration?.image = UIImage(imageLiteralResourceName: imageName)
+            button.configuration?.image = attachmentType == .dictate
+                ? UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(pointSize: 22))
+                : UIImage(imageLiteralResourceName: imageName)
             accessibilityIdentifier = UIView.accessibilityIdentifier(in: self, name: "format-\(attachmentType.rawValue)")
             isAccessibilityElement = true
             accessibilityLabel = text

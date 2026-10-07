@@ -14,6 +14,7 @@ protocol MessageActionsDelegate: AnyObject {
     func messageActionsDeleteItem(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsSpeakItem(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsStopSpeakingItem(_ itemViewModel: CVItemViewModelImpl)
+    func messageActionsTranscribeItem(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsEditItem(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsShowPaymentDetails(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsEndPoll(_ itemViewModel: CVItemViewModelImpl)
@@ -183,6 +184,19 @@ enum MessageActionBuilder {
         )
     }
 
+    static func transcribe(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
+        MessageAction(
+            .transcribe,
+            accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_TRANSCRIBE", comment: "Action sheet accessibility label for transcribing a voice message on device"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "transcribe"),
+            contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_TRANSCRIBE", comment: "Context menu button title for transcribing a voice message on device"),
+            contextMenuAttributes: [],
+            block: { [weak delegate] _ in
+                delegate?.messageActionsTranscribeItem(itemViewModel)
+            },
+        )
+    }
+
     static func endPoll(
         itemViewModel: CVItemViewModelImpl,
         delegate: MessageActionsDelegate,
@@ -281,7 +295,7 @@ class MessageActions {
             if AppEnvironment.shared.speechManagerRef.isSpeaking {
                 let stopSpeakingAction = MessageActionBuilder.stopSpeakingMessage(itemViewModel: itemViewModel, delegate: delegate)
                 actions.append(stopSpeakingAction)
-            } else if UIAccessibility.isSpeakSelectionEnabled {
+            } else if UIAccessibility.isSpeakSelectionEnabled || AutoSTTSettings.isActive {
                 let speakAction = MessageActionBuilder.speakMessage(itemViewModel: itemViewModel, delegate: delegate)
                 actions.append(speakAction)
             }
@@ -322,6 +336,10 @@ class MessageActions {
         if itemViewModel.canSaveMedia {
             let saveMediaAction = MessageActionBuilder.saveMedia(itemViewModel: itemViewModel, delegate: delegate)
             actions.append(saveMediaAction)
+        }
+
+        if AutoSTTSettings.isActive, itemViewModel.audioAttachmentStream != nil {
+            actions.append(MessageActionBuilder.transcribe(itemViewModel: itemViewModel, delegate: delegate))
         }
 
         if shouldAllowMessageSendActions {

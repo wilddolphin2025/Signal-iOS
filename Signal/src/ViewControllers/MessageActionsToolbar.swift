@@ -25,6 +25,7 @@ public class MessageAction: NSObject {
         case select
         case speak
         case stopSpeaking
+        case transcribe
         case edit
         case showPaymentDetails
         case endPoll
@@ -45,6 +46,7 @@ public class MessageAction: NSObject {
             case .showPaymentDetails: 8
             case .speak: 9
             case .stopSpeaking: 10
+            case .transcribe: 4
             case .info: 11
             case .pin: 12
             case .unpin: 13
@@ -73,6 +75,9 @@ public class MessageAction: NSObject {
     }
 
     var contextMenuIcon: UIImage {
+        if actionType == .transcribe, let image = UIImage(systemName: "text.bubble") {
+            return image
+        }
         let icon: ThemeIcon = {
             switch actionType {
             case .reply:
@@ -95,6 +100,8 @@ public class MessageAction: NSObject {
                 return .contextMenuSpeak
             case .stopSpeaking:
                 return .contextMenuStopSpeaking
+            case .transcribe:
+                return .contextMenuSpeak
             case .edit:
                 return .contextMenuEdit
             case .showPaymentDetails:

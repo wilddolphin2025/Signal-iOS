@@ -561,6 +561,28 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         present(OWSNavigationController(rootViewController: newPollViewController), animated: true)
     }
 
+    func dictateButtonPressed() {
+        AssertIsOnMainThread()
+        guard #available(iOS 26, *) else { return }
+
+        dismissKeyboard()
+
+        AutoSTTViewController.present(
+            from: self,
+            source: .microphone,
+            onInsertText: { [weak self] text in
+                guard let inputToolbar = self?.inputToolbar else { return }
+                let existing = inputToolbar.messageBodyForSending?.text ?? ""
+                let combined = existing.isEmpty ? text : existing + " " + text
+                inputToolbar.setMessageBody(MessageBody(text: combined, ranges: .empty), animated: true)
+                inputToolbar.beginEditingMessage()
+            },
+            onSendVoiceNote: { [weak self] url in
+                self?.sendVoiceMessageDraft(SynthesizedVoiceNoteDraft(url: url))
+            },
+        )
+    }
+
     public func didSelectRecentPhoto(asset: PHAsset, attachment: PreviewableAttachment, attachmentLimits: OutgoingAttachmentLimits) {
         AssertIsOnMainThread()
 

@@ -94,6 +94,10 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         viewState.localFileBackupRestoreProgressView.startTracking()
         viewState.localFileBackupExportProgressView.startTracking()
 
+        if #available(iOS 26, *), viewState.chatListMode == .inbox {
+            installVoiceCommandBanner { [weak self] in self?.updateRightBarButtonItems() }
+        }
+
         updateBarButtonItems()
         updateArchiveReminderView()
         updateRegistrationReminderView()
@@ -813,6 +817,10 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
 
         if let proxyButton = viewState.proxyButtonCreator.buildButton() {
             rightBarButtonItems.append(proxyButton)
+        }
+
+        if #available(iOS 26, *), let voiceButton = voiceCommandBarButton() {
+            rightBarButtonItems.append(voiceButton)
         }
 
         navigationItem.rightBarButtonItems = rightBarButtonItems

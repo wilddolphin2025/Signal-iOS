@@ -433,6 +433,9 @@
 /* Button in a context menu from the 'manage' button in attachment panel that opens the iOS system settings for Signal to update access permissions */
 "ATTACHMENT_KEYBOARD_CONTEXT_MENU_BUTTON_SYSTEM_SETTINGS" = "Go to Settings";
 
+/* A button to start on-device dictation from the Attachment Keyboard */
+"ATTACHMENT_KEYBOARD_DICTATE" = "Dictate";
+
 /* A button to select a file from the Attachment Keyboard */
 "ATTACHMENT_KEYBOARD_FILE" = "File";
 
@@ -546,6 +549,102 @@
 
 /* Title for sheet shown when tapping a voice message that has expired and is unavailable for download */
 "AUDIO_UNAVAILABLE_SHEET_TITLE" = "Voice Message Not Available";
+
+/* Shown when Apple Intelligence is turned off, so smart formatting uses rules only. */
+"AUTO_STT_AI_DISABLED" = "Apple Intelligence off — rule-based formatting";
+
+/* Shown when this iPhone can't run the on-device language model. */
+"AUTO_STT_AI_NOT_ELIGIBLE" = "Rule-based formatting";
+
+/* Shown while the on-device language model is still downloading. */
+"AUTO_STT_AI_NOT_READY" = "Language model downloading";
+
+/* Toast after copying a transcript. */
+"AUTO_STT_COPIED" = "Transcript copied";
+
+/* Title of the on-device dictation sheet. */
+"AUTO_STT_DICTATE_TITLE" = "Dictate";
+
+/* Shown after speech models download. Embeds {{comma-separated languages}}. */
+"AUTO_STT_DOWNLOAD_DONE" = "Ready for offline use: %@";
+
+/* Shown when some speech models couldn't be downloaded. Embeds {{comma-separated languages}}. */
+"AUTO_STT_DOWNLOAD_UNAVAILABLE" = "Not available on this iPhone right now: %@. Check storage and Wi-Fi, then try again.";
+
+/* Error when audio input can't be started for dictation. */
+"AUTO_STT_ERROR_AUDIO" = "The microphone is busy. End any call or recording and try again.";
+
+/* Error when microphone permission is denied for dictation. */
+"AUTO_STT_ERROR_MICROPHONE" = "Allow Signal to use the microphone in Settings to dictate.";
+
+/* Error when a language isn't supported on this device. Embeds {{language}}. */
+"AUTO_STT_ERROR_UNSUPPORTED_LANGUAGE" = "%@ speech recognition isn't available on this iPhone.";
+
+/* Inserts the transcript into the message composer. */
+"AUTO_STT_INSERT" = "Insert";
+
+/* AutoSTT language option: detect the spoken language automatically. */
+"AUTO_STT_LANGUAGE_AUTOMATIC" = "Automatic";
+
+/* Starts on-device dictation. */
+"AUTO_STT_LISTEN" = "Listen";
+
+/* Converts the transcript to speech and sends it as a voice message. */
+"AUTO_STT_SEND_VOICE" = "Send Voice";
+
+/* Switch for labeling different speakers in transcripts. */
+"AUTO_STT_SETTINGS_DIARIZATION" = "Speaker Labels";
+
+/* Button that downloads on-device speech models for offline use. */
+"AUTO_STT_SETTINGS_DOWNLOAD" = "Download Speech Models for Offline Use";
+
+/* Switch enabling AutoSTT: on-device dictation, voice message transcription and text-to-speech. */
+"AUTO_STT_SETTINGS_ENABLE" = "AutoSTT";
+
+/* Footer explaining on-device speech settings. Embeds {{language model status}}. */
+"AUTO_STT_SETTINGS_FOOTER" = "Dictate messages, transcribe voice messages and read messages aloud in English, Spanish and Russian. Speech never leaves this iPhone and works offline once models are downloaded. Formatting model: %@.";
+
+/* Header for on-device speech-to-text settings. */
+"AUTO_STT_SETTINGS_HEADER" = "On-Device Speech";
+
+/* Setting for the spoken language used by AutoSTT. */
+"AUTO_STT_SETTINGS_LANGUAGE" = "Spoken Language";
+
+/* Switch for background noise attenuation during transcription. */
+"AUTO_STT_SETTINGS_NOISE" = "Noise Attenuation";
+
+/* Switch for masking profanity in transcripts. */
+"AUTO_STT_SETTINGS_PROFANITY" = "Profanity Filter";
+
+/* Switch for smart formatting of transcripts with the on-device language model. */
+"AUTO_STT_SETTINGS_SMART_FORMAT" = "Smart Formatting";
+
+/* Reads the transcript aloud with on-device text-to-speech. */
+"AUTO_STT_SPEAK" = "Speak";
+
+/* Speaker label in a transcript. Embeds {{speaker number}}. */
+"AUTO_STT_SPEAKER_FORMAT" = "Speaker %d";
+
+/* Shown while detecting the spoken language of a voice message. */
+"AUTO_STT_STATUS_DETECTING" = "Detecting language…";
+
+/* Shown when transcription has finished. */
+"AUTO_STT_STATUS_DONE" = "Done";
+
+/* Shown while on-device dictation is listening. */
+"AUTO_STT_STATUS_LISTENING" = "Listening";
+
+/* Indicates speech processing happens only on this iPhone. */
+"AUTO_STT_STATUS_ON_DEVICE" = "On device";
+
+/* Shown while a voice message is being transcribed. */
+"AUTO_STT_STATUS_TRANSCRIBING" = "Transcribing";
+
+/* Stops on-device dictation. */
+"AUTO_STT_STOP" = "Stop";
+
+/* Title of the voice message transcript sheet. */
+"AUTO_STT_TRANSCRIPT_TITLE" = "Transcript";
 
 /* Text prompting the user to choose a color when editing their avatar */
 "AVATAR_EDIT_VIEW_CHOOSE_A_COLOR" = "Choose a Color";
@@ -2562,6 +2661,9 @@
 
 /* Context menu button title */
 "CONTEXT_MENU_STOP_SPEAKING_MESSAGE" = "Stop";
+
+/* Context menu button title for transcribing a voice message on device */
+"CONTEXT_MENU_TRANSCRIBE" = "Transcribe";
 
 /* Message for the 'conversation delete confirmation' alert. */
 "CONVERSATION_DELETE_CONFIRMATION_ALERT_MESSAGE" = "This chat will be deleted from all your devices.";
@@ -5868,6 +5970,9 @@
 
 /* Title for message actions for a sticker pack. */
 "MESSAGE_ACTION_TITLE_STICKER_PACK" = "Sticker Pack";
+
+/* Action sheet accessibility label for transcribing a voice message on device */
+"MESSAGE_ACTION_TRANSCRIBE" = "Transcribe Voice Message";
 
 /* Title for the 'message approval' dialog. */
 "MESSAGE_APPROVAL_DIALOG_TITLE" = "Message";
@@ -11025,6 +11130,54 @@
 
 /* Accessibility label for placing a voice call */
 "VOICE_CALL_LABEL" = "Voice Call";
+
+/* Accessibility hint for the voice commands banner on the chat list. */
+"VOICE_COMMANDS_BANNER_A11Y_HINT" = "Double-tap to pause or resume listening.";
+
+/* Shown on the chat list while voice commands listen and nothing was heard yet. */
+"VOICE_COMMANDS_BANNER_HINT" = "Say “Call” and a name. Say “Help” for more.";
+
+/* Accessibility label for the chat list button that turns voice commands off. */
+"VOICE_COMMANDS_BUTTON_TURN_OFF" = "Turn off voice commands";
+
+/* Accessibility label for the chat list button that turns voice commands on. */
+"VOICE_COMMANDS_BUTTON_TURN_ON" = "Turn on voice commands";
+
+/* Switch for listening for voice commands during calls. */
+"VOICE_COMMANDS_SETTINGS_CLEAR_FINGERPRINT" = "Clear Voice Fingerprint";
+
+/* Confirms clearing the active voice fingerprint. */
+"VOICE_COMMANDS_SETTINGS_CLEAR_FINGERPRINT_CONFIRM" = "Clear Active Fingerprint";
+
+/* Explains that clearing the voice fingerprint keeps a copy on file. */
+"VOICE_COMMANDS_SETTINGS_CLEAR_FINGERPRINT_MESSAGE" = "Stops this voice from controlling Signal. A copy stays on this iPhone. Signal will ask “Please say Hey Signal” so you or someone else can take over.";
+
+/* Shows that the voice fingerprint was cleared but the file was kept. */
+"VOICE_COMMANDS_SETTINGS_FINGERPRINT_ARCHIVED" = "Cleared, kept on file";
+
+/* Shows that no voice fingerprint has been saved yet. */
+"VOICE_COMMANDS_SETTINGS_FINGERPRINT_NONE" = "None";
+
+/* Shows that a voice fingerprint is saved and locking commands. */
+"VOICE_COMMANDS_SETTINGS_FINGERPRINT_SAVED" = "Saved";
+
+/* Switch for listening for voice commands during calls. */
+"VOICE_COMMANDS_SETTINGS_DURING_CALLS" = "Listen During Calls";
+
+/* Switch enabling hands-free voice commands for calling. */
+"VOICE_COMMANDS_SETTINGS_ENABLE" = "Hands-Free Calling";
+
+/* Footer explaining how hands-free voice commands work. */
+"VOICE_COMMANDS_SETTINGS_FOOTER" = "On launch Signal asks “Please say Hey Signal”. The first voice that answers becomes the only one that can give commands. Clearing the fingerprint keeps a copy on this iPhone. During a call, start with “Signal”, for example “Signal, mute”.";
+
+/* Header for hands-free voice command settings. */
+"VOICE_COMMANDS_SETTINGS_HEADER" = "Voice Commands";
+
+/* Switch requiring the wake word 'Hey Signal' before every voice command. */
+"VOICE_COMMANDS_SETTINGS_WAKE_WORD" = "Always Require “Hey Signal”";
+
+/* Switch for continuing to listen for voice commands when the screen locks. */
+"VOICE_COMMANDS_SETTINGS_WHEN_LOCKED" = "Keep Listening When Locked";
 
 /* Indicates how to cancel a voice message. */
 "VOICE_MESSAGE_CANCEL_INSTRUCTIONS" = "Slide to cancel";

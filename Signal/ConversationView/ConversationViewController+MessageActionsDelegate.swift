@@ -244,11 +244,24 @@ extension ConversationViewController: MessageActionsDelegate {
             }
         }()
 
+        if #available(iOS 26, *), AutoSTTSettings.isActive {
+            OnDeviceTTS.applyBestVoice(to: utterance)
+        }
         AppEnvironment.shared.speechManagerRef.speak(utterance)
     }
 
     func messageActionsStopSpeakingItem(_ itemViewModel: CVItemViewModelImpl) {
         AppEnvironment.shared.speechManagerRef.stop()
+    }
+
+    func messageActionsTranscribeItem(_ itemViewModel: CVItemViewModelImpl) {
+        guard #available(iOS 26, *), let audioStream = itemViewModel.audioAttachmentStream else { return }
+        do {
+            let url = try audioStream.makeDecryptedCopy(filename: itemViewModel.componentState.audioAttachment?.sourceFilename)
+            AutoSTTViewController.present(from: self, source: .file(url))
+        } catch {
+            owsFailDebug("Couldn't decrypt audio for transcription: \(error)")
+        }
     }
 
     func messageActionsShowPaymentDetails(_ itemViewModel: CVItemViewModelImpl) {

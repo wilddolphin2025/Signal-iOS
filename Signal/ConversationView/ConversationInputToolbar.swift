@@ -61,6 +61,8 @@ protocol ConversationInputToolbarDelegate: AnyObject {
 
     func pollButtonPressed()
 
+    func dictateButtonPressed()
+
     func didSelectRecentPhoto(asset: PHAsset, attachment: PreviewableAttachment, attachmentLimits: OutgoingAttachmentLimits)
 
     func showUnblockConversationUI(completion: ((Bool) -> Void)?)
@@ -3414,6 +3416,10 @@ extension ConversationInputToolbar: AttachmentKeyboardDelegate {
 
     func didTapPoll() {
         inputToolbarDelegate?.pollButtonPressed()
+    }
+
+    func didTapDictate() {
+        inputToolbarDelegate?.dictateButtonPressed()
     }
 
     var isGroup: Bool {

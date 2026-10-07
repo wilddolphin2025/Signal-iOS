@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F6589B9FD608085DA5BDAEE0 /* AutoSTTViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E504E4DC95EDDD8925A692 /* AutoSTTViewController.swift */; };
+		5E36A9F2B7953464C974AD27 /* OnDeviceSpeechIntelligence.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC0A5B18F4DEE723D49FE322 /* OnDeviceSpeechIntelligence.swift */; };
+		B137AE714375052DAEC7A1D0 /* OnDeviceSTT.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D29D3D0E5FE515D7D6F762 /* OnDeviceSTT.swift */; };
+		5771E267D4C46E09B2EA8424 /* OnDeviceSTTSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1234030AD0EA75807591F8 /* OnDeviceSTTSession.swift */; };
+		10F395A9F18A21BAFF973499 /* VoiceSpokenNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075901AF7AE6BFB4A7142B6 /* VoiceSpokenNumber.swift */; };
+		39F13DD58AE297013769DA10 /* VoiceCommandBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78B32850C90B3BD4427DD645 /* VoiceCommandBanner.swift */; };
+		E7EA163B5751DC7491FEEA3A /* VoiceCommandService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 696171DE077C6E035C359D91 /* VoiceCommandService.swift */; };
+		423884E2E60ED4B168C1E044 /* VoiceContactMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AD4ADF820B6AB8E9EB6A0A /* VoiceContactMatcher.swift */; };
+		09922D47172A37FD81D0A02D /* VoicePrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D4FA790DE48A33BBACDCF7 /* VoicePrompts.swift */; };
+		FA041BA87F0082D506511B03 /* VoiceCommandGrammar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01436FF736BD77408D58491 /* VoiceCommandGrammar.swift */; };
 		040277FA303DCFA6009C1468 /* LocalFileBackupAttachmentRestoreProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040277F9303DCF9B009C1468 /* LocalFileBackupAttachmentRestoreProgress.swift */; };
 		040277FE303DE4F2009C1468 /* ChatListViewController+LocalFileBackupRestoreProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040277FD303DE4F2009C1468 /* ChatListViewController+LocalFileBackupRestoreProgressView.swift */; };
 		040506F82F7EEF3B0078B769 /* RemoteReleaseNotesFetchingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040506F72F7EEF290078B769 /* RemoteReleaseNotesFetchingManager.swift */; };
@@ -962,6 +972,7 @@
 		55BD355C2F16DAC0008E989C /* input_video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 5531BE0E2F15B97F002AF66F /* input_video.mp4 */; };
 		5AA002E62CA24566002D1CC2 /* SessionStoreTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA002E52CA2455F002D1CC2 /* SessionStoreTest.swift */; };
 		5F0FCB3F9BC04E7EB4B5A9DA /* ContactSharingRowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C97A48E040D913B54956AB /* ContactSharingRowCell.swift */; };
+		61475E7AED76A77DD11F9968 /* RegistrationSignalLoginDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CE4F92E120FC707A4CBFF39 /* RegistrationSignalLoginDetailsViewController.swift */; };
 		616577F953D77424E32C7438 /* Pods_SignalUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 675486AB8F0612FF2C717BAE /* Pods_SignalUI.framework */; };
 		63C24D4D306AF7A100D4C167 /* ContactSharingPermissionPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C24D4C306AF7A100D4C167 /* ContactSharingPermissionPromptView.swift */; };
 		65D2854846F2127979853B12 /* ContactSharingPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAE5380475512D4C3083EDC /* ContactSharingPickerViewController.swift */; };
@@ -1942,7 +1953,6 @@
 		C16AFACB2BE9CA6F00838FFB /* HmacStreamTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16AFACA2BE9CA6F00838FFB /* HmacStreamTransform.swift */; };
 		C16B8B752B8940D40030BA24 /* OutgoingSentMessageTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16B8B742B8940D40030BA24 /* OutgoingSentMessageTranscript.swift */; };
 		C172D54F30462D0F002AF55F /* RegistrationSignalLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172D54E30462D02002AF55F /* RegistrationSignalLoginViewController.swift */; };
-		61475E7AED76A77DD11F9968 /* RegistrationSignalLoginDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CE4F92E120FC707A4CBFF39 /* RegistrationSignalLoginDetailsViewController.swift */; };
 		C17310A72BD9D45400B7A151 /* BackupServiceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17310A62BD9D45400B7A151 /* BackupServiceAuth.swift */; };
 		C17345BB2A5E000300C6426D /* PreKeyTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17345BA2A5E000300C6426D /* PreKeyTarget.swift */; };
 		C17586642E2AC3CE008B3A13 /* MediaRootBackupKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17586632E2AC3CE008B3A13 /* MediaRootBackupKey.swift */; };
@@ -4287,6 +4297,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		13E504E4DC95EDDD8925A692 /* AutoSTTViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoSTTViewController.swift; sourceTree = "<group>"; };
+		AC0A5B18F4DEE723D49FE322 /* OnDeviceSpeechIntelligence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceSpeechIntelligence.swift; sourceTree = "<group>"; };
+		D9D29D3D0E5FE515D7D6F762 /* OnDeviceSTT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceSTT.swift; sourceTree = "<group>"; };
+		8E1234030AD0EA75807591F8 /* OnDeviceSTTSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceSTTSession.swift; sourceTree = "<group>"; };
+		8075901AF7AE6BFB4A7142B6 /* VoiceSpokenNumber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSpokenNumber.swift; sourceTree = "<group>"; };
+		78B32850C90B3BD4427DD645 /* VoiceCommandBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCommandBanner.swift; sourceTree = "<group>"; };
+		696171DE077C6E035C359D91 /* VoiceCommandService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCommandService.swift; sourceTree = "<group>"; };
+		86AD4ADF820B6AB8E9EB6A0A /* VoiceContactMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceContactMatcher.swift; sourceTree = "<group>"; };
+		79D4FA790DE48A33BBACDCF7 /* VoicePrompts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoicePrompts.swift; sourceTree = "<group>"; };
+		B01436FF736BD77408D58491 /* VoiceCommandGrammar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCommandGrammar.swift; sourceTree = "<group>"; };
 		040277F9303DCF9B009C1468 /* LocalFileBackupAttachmentRestoreProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalFileBackupAttachmentRestoreProgress.swift; sourceTree = "<group>"; };
 		040277FD303DE4F2009C1468 /* ChatListViewController+LocalFileBackupRestoreProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatListViewController+LocalFileBackupRestoreProgressView.swift"; sourceTree = "<group>"; };
 		040506F72F7EEF290078B769 /* RemoteReleaseNotesFetchingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteReleaseNotesFetchingManager.swift; sourceTree = "<group>"; };
@@ -4882,6 +4902,7 @@
 		34FC7EEB265834F30046707A /* AvatarBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarBuilder.swift; sourceTree = "<group>"; };
 		34FCCA03264AEDFE00A63EDE /* CustomColorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomColorViewController.swift; sourceTree = "<group>"; };
 		39B85AE8CD37B05A1B144605 /* Pods_SignalShareExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalShareExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3CE4F92E120FC707A4CBFF39 /* RegistrationSignalLoginDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationSignalLoginDetailsViewController.swift; sourceTree = "<group>"; };
 		44B6CDDFDDD0811DBBC57CD1 /* Pods-SignalTests.profiling.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalTests.profiling.xcconfig"; path = "Target Support Files/Pods-SignalTests/Pods-SignalTests.profiling.xcconfig"; sourceTree = "<group>"; };
 		4503F1BB20470A5B00CEE724 /* classic-quiet.aifc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "classic-quiet.aifc"; sourceTree = "<group>"; };
 		4503F1BC20470A5B00CEE724 /* classic.aifc */ = {isa = PBXFileReference; lastKnownFileType = file; path = classic.aifc; sourceTree = "<group>"; };
@@ -6352,7 +6373,6 @@
 		C16AFACA2BE9CA6F00838FFB /* HmacStreamTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HmacStreamTransform.swift; sourceTree = "<group>"; };
 		C16B8B742B8940D40030BA24 /* OutgoingSentMessageTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingSentMessageTranscript.swift; sourceTree = "<group>"; };
 		C172D54E30462D02002AF55F /* RegistrationSignalLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationSignalLoginViewController.swift; sourceTree = "<group>"; };
-		3CE4F92E120FC707A4CBFF39 /* RegistrationSignalLoginDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationSignalLoginDetailsViewController.swift; sourceTree = "<group>"; };
 		C17310A62BD9D45400B7A151 /* BackupServiceAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupServiceAuth.swift; sourceTree = "<group>"; };
 		C17345BA2A5E000300C6426D /* PreKeyTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreKeyTarget.swift; sourceTree = "<group>"; };
 		C17586632E2AC3CE008B3A13 /* MediaRootBackupKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaRootBackupKey.swift; sourceTree = "<group>"; };
@@ -8723,6 +8743,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D884B1919DC7B965EC0B6503 /* AutoSTT */ = {
+			isa = PBXGroup;
+			children = (
+				13E504E4DC95EDDD8925A692 /* AutoSTTViewController.swift */,
+				AC0A5B18F4DEE723D49FE322 /* OnDeviceSpeechIntelligence.swift */,
+				D9D29D3D0E5FE515D7D6F762 /* OnDeviceSTT.swift */,
+				8E1234030AD0EA75807591F8 /* OnDeviceSTTSession.swift */,
+				8075901AF7AE6BFB4A7142B6 /* VoiceSpokenNumber.swift */,
+				78B32850C90B3BD4427DD645 /* VoiceCommandBanner.swift */,
+				696171DE077C6E035C359D91 /* VoiceCommandService.swift */,
+				86AD4ADF820B6AB8E9EB6A0A /* VoiceContactMatcher.swift */,
+				79D4FA790DE48A33BBACDCF7 /* VoicePrompts.swift */,
+				B01436FF736BD77408D58491 /* VoiceCommandGrammar.swift */,
+			);
+			path = AutoSTT;
+			sourceTree = "<group>";
+		};
 		040507132F80639B0078B769 /* RemoteReleaseNotes */ = {
 			isa = PBXGroup;
 			children = (
@@ -12431,6 +12468,7 @@
 				5045F44129E0DAA400058E5F /* AppLaunch */,
 				661AEE462C2088DF0046B1D8 /* Attachments */,
 				D9EB00702FE0730700F81AD0 /* Autofill */,
+				D884B1919DC7B965EC0B6503 /* AutoSTT */,
 				D9F96EDB2D824E6900466C6A /* Avatars */,
 				502D9AA2303CC71700FA0D7D /* Axolotl */,
 				D951F52F2D9B233300C5EBF3 /* Backups */,
@@ -18557,6 +18595,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6589B9FD608085DA5BDAEE0 /* AutoSTTViewController.swift in Sources */,
+				5E36A9F2B7953464C974AD27 /* OnDeviceSpeechIntelligence.swift in Sources */,
+				B137AE714375052DAEC7A1D0 /* OnDeviceSTT.swift in Sources */,
+				5771E267D4C46E09B2EA8424 /* OnDeviceSTTSession.swift in Sources */,
+				10F395A9F18A21BAFF973499 /* VoiceSpokenNumber.swift in Sources */,
+				39F13DD58AE297013769DA10 /* VoiceCommandBanner.swift in Sources */,
+				E7EA163B5751DC7491FEEA3A /* VoiceCommandService.swift in Sources */,
+				423884E2E60ED4B168C1E044 /* VoiceContactMatcher.swift in Sources */,
+				09922D47172A37FD81D0A02D /* VoicePrompts.swift in Sources */,
+				FA041BA87F0082D506511B03 /* VoiceCommandGrammar.swift in Sources */,
 				D91174562E8F35C1009EB756 /* AccountEntropyPoolTextView.swift in Sources */,
 				88E728FF25F0241100A2E4A4 /* AccountSettingsViewController.swift in Sources */,
 				349439D624360C30001045F7 /* AddGroupMembersViewController.swift in Sources */,
@@ -22017,7 +22065,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				DEVELOPMENT_TEAM = U68MSDN6DR;
+				DEVELOPMENT_TEAM = PPZTNTHDFC;
 				ENABLE_ENHANCED_SECURITY = YES;
 				ENABLE_POINTER_AUTHENTICATION = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -22060,7 +22108,7 @@
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -DTESTABLE_BUILD";
 				SDKROOT = iphoneos;
-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+				SIGNAL_BUNDLEID_PREFIX = us.wilddolphin;
 				SIGNAL_MERCHANTID = org.signalfoundation;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
@@ -22101,6 +22149,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Signal/Signal.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PPZTNTHDFC;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -22281,7 +22330,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				DEVELOPMENT_TEAM = U68MSDN6DR;
+				DEVELOPMENT_TEAM = PPZTNTHDFC;
 				ENABLE_ENHANCED_SECURITY = YES;
 				ENABLE_POINTER_AUTHENTICATION = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -22321,7 +22370,7 @@
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				OTHER_SWIFT_FLAGS = "$(inherited) -DTESTABLE_BUILD";
 				SDKROOT = iphoneos;
-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+				SIGNAL_BUNDLEID_PREFIX = us.wilddolphin;
 				SIGNAL_MERCHANTID = org.signalfoundation;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
@@ -22362,6 +22411,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Signal/Signal.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PPZTNTHDFC;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_SOURCE_FILE_NAMES[arch=*]" = Signal/test/Assets/input_video.mp4;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -22543,7 +22593,7 @@
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = U68MSDN6DR;
+				DEVELOPMENT_TEAM = PPZTNTHDFC;
 				ENABLE_ENHANCED_SECURITY = YES;
 				ENABLE_POINTER_AUTHENTICATION = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -22587,7 +22637,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "$(inherited) -DTESTABLE_BUILD -DUSE_DEBUG_UI";
 				SDKROOT = iphoneos;
-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+				SIGNAL_BUNDLEID_PREFIX = us.wilddolphin;
 				SIGNAL_MERCHANTID = org.signalfoundation;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
@@ -22653,7 +22703,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				DEVELOPMENT_TEAM = U68MSDN6DR;
+				DEVELOPMENT_TEAM = PPZTNTHDFC;
 				ENABLE_ENHANCED_SECURITY = YES;
 				ENABLE_POINTER_AUTHENTICATION = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -22690,7 +22740,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+				SIGNAL_BUNDLEID_PREFIX = us.wilddolphin;
 				SIGNAL_MERCHANTID = org.signalfoundation;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
@@ -22734,6 +22784,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = PPZTNTHDFC;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_SOURCE_FILE_NAMES[arch=*]" = Signal/test/Assets/input_video.mp4;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -22773,6 +22824,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Signal/Signal-AppStore.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PPZTNTHDFC;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_SOURCE_FILE_NAMES[arch=*]" = Signal/test/Assets/input_video.mp4;
 				GCC_OPTIMIZATION_LEVEL = 3;
