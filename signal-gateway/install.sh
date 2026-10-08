@@ -45,7 +45,12 @@ if [[ ! -x /usr/local/bin/signal-cli ]]; then
   rm -rf "${tmp}"
 fi
 
-if [[ ! -f "${TLS_DIR}/fullchain.pem" || ! -f "${TLS_DIR}/privkey.pem" ]]; then
+LE_LIVE="/etc/letsencrypt/live/${DOMAIN}"
+if [[ -f "${LE_LIVE}/fullchain.pem" && -f "${LE_LIVE}/privkey.pem" ]]; then
+  mkdir -p "${TLS_DIR}"
+  ln -sfn "${LE_LIVE}/fullchain.pem" "${TLS_DIR}/fullchain.pem"
+  ln -sfn "${LE_LIVE}/privkey.pem" "${TLS_DIR}/privkey.pem"
+elif [[ ! -f "${TLS_DIR}/fullchain.pem" || ! -f "${TLS_DIR}/privkey.pem" ]]; then
   openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
     -keyout "${TLS_DIR}/privkey.pem" \
     -out "${TLS_DIR}/fullchain.pem" \
@@ -58,7 +63,13 @@ install -m 0644 "${DEPLOY_PATH}/systemd/signal-cli.service" /etc/systemd/system/
 install -m 0644 "${DEPLOY_PATH}/systemd/signal-bridge.service" /etc/systemd/system/signal-bridge.service
 install -m 0644 "${DEPLOY_PATH}/nginx/rtc.wilddolphin.us.conf" /etc/nginx/sites-available/rtc.wilddolphin.us.conf
 ln -sfn /etc/nginx/sites-available/rtc.wilddolphin.us.conf /etc/nginx/sites-enabled/rtc.wilddolphin.us.conf
-rm -f /etc/nginx/sites-enabled/default
+rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/directcall
+
+if command -v ufw >/dev/null 2>&1; then
+  ufw allow 80/tcp comment "HTTP" || true
+  ufw allow 443/tcp comment "HTTPS" || true
+  ufw allow 10000:20000/udp comment "WebRTC media" || true
+fi
 
 if [[ ! -f /etc/signal-gateway.env ]]; then
   cat > /etc/signal-gateway.env <<'EOF'
@@ -75,6 +86,7 @@ chmod 0640 /etc/signal-gateway.env || true
 
 nginx -t
 systemctl daemon-reload
+systemctl enable --now nginx
 systemctl enable --now signal-gateway.service signal-cli.service signal-bridge.service
 systemctl reload nginx
 
