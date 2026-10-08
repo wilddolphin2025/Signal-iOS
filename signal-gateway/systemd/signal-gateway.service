@@ -1,0 +1,18 @@
+[Unit]
+Description=Wild Dolphin Signal WebRTC gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=signal-gateway
+Group=signal-gateway
+WorkingDirectory=/opt/signal-gateway
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=-/etc/signal-gateway.env
+ExecStart=/opt/signal-gateway/.venv/bin/python /opt/signal-gateway/gateway.py --host 127.0.0.1 --port 8787
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

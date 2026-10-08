@@ -369,6 +369,28 @@ public class RecipientPickerViewController: OWSViewController, OWSNavigationChil
             tableContents.add(staticSection)
         }
 
+        let gatewayQuery = isSearching ? searchText : ""
+        let gatewayContacts = SignalGatewayContacts.contacts(matchingSearch: gatewayQuery)
+        if !gatewayContacts.isEmpty {
+            let gatewaySection = OWSTableSection(title: OWSLocalizedString(
+                "SIGNAL_GATEWAY_TEST_CONTACTS_SECTION",
+                value: "RTC test contacts",
+                comment: "Section header for built-in echo/videoecho/prerecorded/recordandplayback test numbers.",
+            ))
+            for contact in gatewayContacts {
+                gatewaySection.add(OWSTableItem.item(
+                    icon: contact.wantsVideo ? .buttonVideoCall : .buttonVoiceCall,
+                    name: contact.displayName,
+                    subtitle: "\(contact.e164)  ·  \(contact.shortNumber)  ·  \(contact.id)",
+                    accessoryType: .disclosureIndicator,
+                    actionBlock: { [weak self] in
+                        self?.tryToSelectRecipient(.for(address: contact.address))
+                    },
+                ))
+            }
+            tableContents.add(gatewaySection)
+        }
+
         // Render any non-contact picked recipients
         if !pickedRecipients.isEmpty, !isSearching {
             let sectionRecipients = pickedRecipients.filter { recipient in

@@ -1,0 +1,54 @@
+name: Signal gateway
+
+on:
+  pull_request:
+  push:
+    paths:
+      - "signal-gateway/**"
+      - "SignalServiceKit/Calls/SignalGatewayContacts.swift"
+      - ".github/workflows/signal-gateway.yml"
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "If true, rsync and install on rtc.wilddolphin.us"
+        type: boolean
+        default: false
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Python deps
+        run: python3 -m pip install aiohttp
+      - name: Generate media fixture
+        run: python3 signal-gateway/scripts/generate-media.py
+      - name: Test contact catalog
+        run: python3 signal-gateway/tests/test_contacts.py
+      - name: Test gateway HTTP API
+        run: python3 signal-gateway/tests/test_gateway_http.py
+
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+    needs: test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install SSH key
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+      - name: Deploy
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          SSH_KEY_PATH: ${{ github.workspace }}/../.ssh/id_ed25519
+        run: |
+          export SSH_KEY_PATH="$HOME/.ssh/id_ed25519"
+          export DEPLOY_HOST="${DEPLOY_HOST:-217.77.3.65}"
+          export DEPLOY_USER="${DEPLOY_USER:-root}"
+          export DEPLOY_PORT="${DEPLOY_PORT:-22}"
+          chmod +x signal-gateway/deploy.sh signal-gateway/install.sh
+          signal-gateway/deploy.sh

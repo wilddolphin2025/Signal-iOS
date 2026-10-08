@@ -1,0 +1,17 @@
+[Unit]
+Description=signal-cli JSON-RPC daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=signal-gateway
+Group=signal-gateway
+WorkingDirectory=/var/lib/signal-cli
+EnvironmentFile=-/etc/signal-gateway.env
+ExecStart=/usr/local/bin/signal-cli --data-dir /var/lib/signal-cli daemon --http 127.0.0.1:7583 --no-receive-stdout
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

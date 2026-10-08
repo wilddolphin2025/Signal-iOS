@@ -930,6 +930,9 @@
 		50DE824B3047766F001955FF /* DeregisteredState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DE824A3047766F001955FF /* DeregisteredState.swift */; };
 		50E39E0E30225D67008E6619 /* GroupStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E39E0D30225D67008E6619 /* GroupStore.swift */; };
 		50E42FEA2C1BA3B900554BD6 /* CallHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E42FE92C1BA3B900554BD6 /* CallHTTPClient.swift */; };
+		A07DC0DE0001000100000002 /* SignalGatewayContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07DC0DE0001000100000001 /* SignalGatewayContacts.swift */; };
+		A07DC0DE0001000100000004 /* SignalGatewayContactsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07DC0DE0001000100000003 /* SignalGatewayContactsTest.swift */; };
+		A07DC0DE0001000100000006 /* GatewayCallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07DC0DE0001000100000005 /* GatewayCallViewController.swift */; };
 		50E458AE3059B7320074446D /* AuthCredentialSalt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E458AD3059B7320074446D /* AuthCredentialSalt.swift */; };
 		50E5E4B129932D9B00E15A1C /* DeviceMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E5E4B029932D9B00E15A1C /* DeviceMessage.swift */; };
 		50E5E4B32993352C00E15A1C /* ChangePhoneNumberPniManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E5E4B22993352C00E15A1C /* ChangePhoneNumberPniManager.swift */; };
@@ -5324,6 +5327,9 @@
 		50E39E0D30225D67008E6619 /* GroupStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupStore.swift; sourceTree = "<group>"; };
 		50E42FE52C1B9EB900554BD6 /* CallLinkState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallLinkState.swift; sourceTree = "<group>"; };
 		50E42FE92C1BA3B900554BD6 /* CallHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallHTTPClient.swift; sourceTree = "<group>"; };
+		A07DC0DE0001000100000001 /* SignalGatewayContacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalGatewayContacts.swift; sourceTree = "<group>"; };
+		A07DC0DE0001000100000003 /* SignalGatewayContactsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalGatewayContactsTest.swift; sourceTree = "<group>"; };
+		A07DC0DE0001000100000005 /* GatewayCallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayCallViewController.swift; sourceTree = "<group>"; };
 		50E458AD3059B7320074446D /* AuthCredentialSalt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthCredentialSalt.swift; sourceTree = "<group>"; };
 		50E5E4B029932D9B00E15A1C /* DeviceMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceMessage.swift; sourceTree = "<group>"; };
 		50E5E4B22993352C00E15A1C /* ChangePhoneNumberPniManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePhoneNumberPniManager.swift; sourceTree = "<group>"; };
@@ -14537,6 +14543,7 @@
 				D9E43BB52CC194140001536E /* GroupCallViewController.swift */,
 				D9E43BB62CC194140001536E /* IncomingCallControls.swift */,
 				D9E43BB72CC194140001536E /* IncomingReactionsView.swift */,
+				A07DC0DE0001000100000005 /* GatewayCallViewController.swift */,
 				D9E43BB82CC194140001536E /* IndividualCallViewController.swift */,
 				D9E43BB92CC194140001536E /* LocalVideoView.swift */,
 				D9E43BBA2CC194140001536E /* NewCallViewController.swift */,
@@ -14989,6 +14996,7 @@
 				D9AA379D2A86C9660088EFFB /* Group */,
 				D9AA379E2A86CA3F0088EFFB /* Individual */,
 				50E42FE92C1BA3B900554BD6 /* CallHTTPClient.swift */,
+				A07DC0DE0001000100000001 /* SignalGatewayContacts.swift */,
 				501F10FF2C7FD688008FC0DD /* CallLinkRecord.swift */,
 				501F11012C7FD999008FC0DD /* CallLinkRecordStore.swift */,
 				50E42FE52C1B9EB900554BD6 /* CallLinkState.swift */,
@@ -15017,6 +15025,7 @@
 				D925C7BA2B7BEC0F00AC73B0 /* OutgoingCallLogEventSyncMessageTest.swift */,
 				D9D321692A8AC9B0004FC110 /* OutgoingGroupCallUpdateMessageTest.swift */,
 				F945FE4C298481EA00C835C7 /* RingrtcFieldTrialsTest.swift */,
+				A07DC0DE0001000100000003 /* SignalGatewayContactsTest.swift */,
 			);
 			path = Calls;
 			sourceTree = "<group>";
@@ -19012,6 +19021,7 @@
 				D9E43C062CC194140001536E /* IncomingReactionsView.swift in Sources */,
 				D9E43C2A2CC194140001536E /* IndividualCall.swift in Sources */,
 				D9E43C2B2CC194140001536E /* IndividualCallService.swift in Sources */,
+				A07DC0DE0001000100000006 /* GatewayCallViewController.swift in Sources */,
 				D9E43C072CC194140001536E /* IndividualCallViewController.swift in Sources */,
 				D97046062E81D4240034C05D /* InfoMessageGroupUpdateMigrator.swift in Sources */,
 				88BCCC8123837B7D00CE5FE6 /* InteractionReactionState.swift in Sources */,
@@ -19703,6 +19713,7 @@
 				50C97C252C3C7F7000A9F384 /* CallEventConversation.swift in Sources */,
 				50D3136F2BFFE9370023EDCC /* CallEventInserter.swift in Sources */,
 				50E42FEA2C1BA3B900554BD6 /* CallHTTPClient.swift in Sources */,
+				A07DC0DE0001000100000002 /* SignalGatewayContacts.swift in Sources */,
 				50A4AC622C111FAE00D89C8E /* CallLinkAuthCredential.swift in Sources */,
 				501F11002C7FD688008FC0DD /* CallLinkRecord.swift in Sources */,
 				501F11022C7FD999008FC0DD /* CallLinkRecordStore.swift in Sources */,
@@ -20914,6 +20925,7 @@
 				6600F367298D9D1100B1EDB7 /* RegistrationSessionManagerTest.swift in Sources */,
 				F9426259289B1B5500460798 /* RemoteConfigManagerTests.swift in Sources */,
 				F945FE4D298481EA00C835C7 /* RingrtcFieldTrialsTest.swift in Sources */,
+				A07DC0DE0001000100000004 /* SignalGatewayContactsTest.swift in Sources */,
 				F942624E289B1B5500460798 /* SDSDatabaseStorageObservationTest.swift in Sources */,
 				F942624B289B1B5500460798 /* SDSDatabaseStorageTest.swift in Sources */,
 				F942624A289B1B5500460798 /* SDSKeyValueStoreTest.swift in Sources */,
