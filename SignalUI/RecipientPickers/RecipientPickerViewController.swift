@@ -1141,6 +1141,10 @@ struct PhoneNumberFinder {
             return []
         }
 
+        if let contact = SignalGatewayContacts.contact(matchingNumber: searchText) {
+            return [.valid(validE164: contact.e164)]
+        }
+
         // Check for valid libPhoneNumber results.
         let uniqueResults = OrderedSet(
             phoneNumberUtil.parsePhoneNumbers(
@@ -1213,6 +1217,18 @@ struct PhoneNumberFinder {
     }
 
     func lookUp(phoneNumber searchResult: SearchResult) async throws -> LookupResult {
+        let rawNumber = searchResult.maybeValidE164
+        if let contact = SignalGatewayContacts.contact(matchingNumber: rawNumber) {
+            let signalRecipients = try await contactDiscoveryManager.lookUp(
+                phoneNumbers: [contact.e164],
+                mode: .oneOffUserRequest,
+            )
+            if let signalRecipient = signalRecipients.first {
+                return .success(signalRecipient)
+            }
+            return .notFound(validE164: contact.e164)
+        }
+
         let validE164ToLookUp: String
         switch searchResult {
         case .valid(validE164: let validE164):
@@ -1327,10 +1343,18 @@ extension RecipientPickerViewController {
             tryToSelectRecipient(.for(address: SignalServiceAddress(phoneNumber: validE164)))
 
         case (.`default`, .notFound(validE164: let validE164)):
+            if let contact = SignalGatewayContacts.contact(matchingNumber: validE164) {
+                tryToSelectRecipient(.for(address: contact.address))
+                return
+            }
             // Otherwise, if we're trying to contact someone, offer to invite them.
             Self.presentSMSInvitationSheet(for: validE164, fromViewController: self)
 
         case (_, .notValid(invalidE164: let invalidE164)):
+            if let contact = SignalGatewayContacts.contact(matchingNumber: invalidE164) {
+                tryToSelectRecipient(.for(address: contact.address))
+                return
+            }
             // If the number isn't valid, show an error so the user can fix it.
             presentInvalidNumberSheet(for: invalidE164)
         }
@@ -1341,6 +1365,9 @@ extension RecipientPickerViewController {
         fromViewController viewController: UIViewController,
         dismissalDelegate: (any SheetDismissalDelegate)? = nil,
     ) {
+        if SignalGatewayContacts.isGatewayNumber(phoneNumber) {
+            return
+        }
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "RECIPIENT_PICKER_INVITE_TITLE",

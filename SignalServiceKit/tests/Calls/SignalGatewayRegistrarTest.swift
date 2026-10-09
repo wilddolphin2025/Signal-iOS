@@ -56,4 +56,15 @@ final class SignalGatewayRegistrarTest: SSKBaseTest {
             XCTAssertTrue(again.allSatisfy(\.isRegistered))
         }
     }
+
+    func testFormattedUSNumberIsRegistered() {
+        write { tx in
+            let recipient = SignalGatewayRegistrar.registeredRecipient(
+                matching: "+1 555-111-1001",
+                tx: tx,
+            )
+            XCTAssertEqual(recipient?.phoneNumber?.stringValue, "+15551111001")
+            XCTAssertTrue(recipient?.isRegistered == true)
+        }
+    }
 }

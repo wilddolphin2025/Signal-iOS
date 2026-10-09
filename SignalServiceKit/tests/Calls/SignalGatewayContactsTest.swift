@@ -29,6 +29,9 @@ final class SignalGatewayContactsTest: XCTestCase {
 
     func testLookupByE164AndExtension() {
         XCTAssertEqual(SignalGatewayContacts.contact(matchingNumber: "+15551111001")?.id, "echo")
+        XCTAssertEqual(SignalGatewayContacts.contact(matchingNumber: "+1 555-111-1001")?.id, "echo")
+        XCTAssertEqual(SignalGatewayContacts.contact(matchingNumber: "555-111-1001")?.id, "echo")
+        XCTAssertEqual(SignalGatewayContacts.contact(matchingNumber: "5551111001")?.id, "echo")
         XCTAssertEqual(SignalGatewayContacts.contact(matchingNumber: "1002")?.id, "videoecho")
         XCTAssertEqual(SignalGatewayContacts.contact(matchingNumber: "15551111003")?.id, "prerecorded")
         XCTAssertNil(SignalGatewayContacts.contact(matchingNumber: "+15550009999"))

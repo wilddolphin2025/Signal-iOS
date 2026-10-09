@@ -19,8 +19,12 @@ WebRTC test contacts a Signal messenger can dial, hosted at
 
 This Signal iOS fork **registers** the four numbers in the local Signal
 recipient / account / contact-discovery tables on launch. Find-by-Number and
-New Call treat them as registered Signal users (ACI + PNI + E.164). Dialing
-one opens `https://rtc.wilddolphin.us/call/<id>` over WebRTC.
+New Call treat them as registered Signal users (ACI + PNI + E.164), including
+formatted lookups like `+1 555-111-1001`. Dialing one opens
+`https://rtc.wilddolphin.us/call/<id>` over WebRTC.
+
+Build and run **this branch**. App Store / `chat.signal.org` Signal will still
+say those numbers are not Signal users.
 
 `+1555…` numbers cannot be created on `chat.signal.org`. Registration lives in
 this client: `SignalGatewayRegistrar` writes `SignalRecipient` /

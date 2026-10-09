@@ -57,8 +57,8 @@ final class ContactDiscoveryTaskQueueImpl: ContactDiscoveryTaskQueue {
         var registeredRecipients = [SignalRecipient]()
         if !gatewayE164s.isEmpty {
             registeredRecipients = await db.awaitableWrite { tx in
-                SignalGatewayRegistrar.registerAll(tx: tx).filter { recipient in
-                    recipient.phoneNumber.flatMap { E164($0.stringValue) }.map(gatewayE164s.contains) ?? false
+                gatewayE164s.compactMap { e164 in
+                    SignalGatewayRegistrar.registeredRecipient(matching: e164.stringValue, tx: tx)
                 }
             }
         }

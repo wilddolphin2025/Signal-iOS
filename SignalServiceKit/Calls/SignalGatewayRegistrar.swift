@@ -24,17 +24,15 @@ public enum SignalGatewayRegistrar {
             owsFailDebug("Invalid gateway E.164 \(contact.e164)")
             return nil
         }
-        guard let localIdentifiers = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx) else {
-            return nil
-        }
 
         let recipientMerger = DependenciesBridge.shared.recipientMerger
         let recipientManager = DependenciesBridge.shared.recipientManager
         let recipientDatabaseTable = DependenciesBridge.shared.recipientDatabaseTable
         let profileManager = SSKEnvironment.shared.profileManagerRef
+        let localIdentifiers = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)
 
         var recipient: SignalRecipient
-        if let merged = recipientMerger.applyMergeFromContactDiscovery(
+        if let localIdentifiers, let merged = recipientMerger.applyMergeFromContactDiscovery(
             localIdentifiers: localIdentifiers,
             phoneNumber: e164,
             pni: contact.pni,
@@ -42,7 +40,9 @@ public enum SignalGatewayRegistrar {
             tx: tx,
         ) {
             recipient = merged
-        } else if let existing = recipientDatabaseTable.fetchRecipient(phoneNumber: e164.stringValue, transaction: tx) {
+        } else if let existing = recipientDatabaseTable.fetchRecipient(phoneNumber: e164.stringValue, transaction: tx)
+            ?? recipientDatabaseTable.fetchRecipient(serviceId: contact.aci, transaction: tx)
+        {
             recipient = existing
         } else {
             recipient = failIfThrowsDatabaseError {
@@ -67,18 +67,20 @@ public enum SignalGatewayRegistrar {
             tx: tx,
         )
 
-        let profile = OWSUserProfile.getOrBuildUserProfile(
-            for: OWSUserProfile.insertableAddress(serviceId: contact.aci, localIdentifiers: localIdentifiers),
-            userProfileWriter: .debugging,
-            tx: tx,
-        )
-        if profile.filteredGivenName != contact.displayName {
-            profile.update(
-                givenName: .setTo(contact.displayName),
-                familyName: .setTo(nil),
+        if let localIdentifiers {
+            let profile = OWSUserProfile.getOrBuildUserProfile(
+                for: OWSUserProfile.insertableAddress(serviceId: contact.aci, localIdentifiers: localIdentifiers),
                 userProfileWriter: .debugging,
-                transaction: tx,
+                tx: tx,
             )
+            if profile.filteredGivenName != contact.displayName {
+                profile.update(
+                    givenName: .setTo(contact.displayName),
+                    familyName: .setTo(nil),
+                    userProfileWriter: .debugging,
+                    transaction: tx,
+                )
+            }
         }
 
         if SignalAccountFinder().signalAccount(for: e164, tx: tx) == nil {
@@ -97,6 +99,17 @@ public enum SignalGatewayRegistrar {
         }
 
         return recipient
+    }
+
+    @discardableResult
+    public static func registeredRecipient(
+        matching rawNumber: String,
+        tx: DBWriteTransaction,
+    ) -> SignalRecipient? {
+        guard let contact = SignalGatewayContacts.contact(matchingNumber: rawNumber) else {
+            return nil
+        }
+        return register(contact, tx: tx)
     }
 
     @discardableResult
