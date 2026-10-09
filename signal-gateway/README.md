@@ -17,8 +17,15 @@ WebRTC test contacts a Signal messenger can dial, hosted at
 - **prerecorded** — plays a short stored clip
 - **recordandplayback** — records a few seconds, then plays it back
 
-This Signal iOS fork lists the four contacts in the New Call picker. Dialing
+This Signal iOS fork **registers** the four numbers in the local Signal
+recipient / account / contact-discovery tables on launch. Find-by-Number and
+New Call treat them as registered Signal users (ACI + PNI + E.164). Dialing
 one opens `https://rtc.wilddolphin.us/call/<id>` over WebRTC.
+
+`+1555…` numbers cannot be created on `chat.signal.org`. Registration lives in
+this client: `SignalGatewayRegistrar` writes `SignalRecipient` /
+`SignalAccount` rows, Contact Discovery returns them without calling CDSI, and
+profile / account-existence checks will not mark them unregistered.
 
 ## On the server
 

@@ -21,6 +21,9 @@
       "display_name": "Echo",
       "short_number": "1001",
       "e164": "+15551111001",
+      "aci": "A07D1001-E570-4000-8000-000015551001",
+      "pni": "A07D1001-E570-5000-8000-000015551001",
+      "registered": true,
       "wants_video": false,
       "summary": "Audio loopback. Speak and hear yourself come back."
     },
@@ -29,6 +32,9 @@
       "display_name": "Video Echo",
       "short_number": "1002",
       "e164": "+15551111002",
+      "aci": "A07D1002-E570-4000-8000-000015551002",
+      "pni": "A07D1002-E570-5000-8000-000015551002",
+      "registered": true,
       "wants_video": true,
       "summary": "Audio and video loopback. Check camera and microphone."
     },
@@ -37,6 +43,9 @@
       "display_name": "Prerecorded",
       "short_number": "1003",
       "e164": "+15551111003",
+      "aci": "A07D1003-E570-4000-8000-000015551003",
+      "pni": "A07D1003-E570-5000-8000-000015551003",
+      "registered": true,
       "wants_video": true,
       "summary": "Plays a short prerecorded audio/video clip."
     },
@@ -45,6 +54,9 @@
       "display_name": "Record and Playback",
       "short_number": "1004",
       "e164": "+15551111004",
+      "aci": "A07D1004-E570-4000-8000-000015551004",
+      "pni": "A07D1004-E570-5000-8000-000015551004",
+      "registered": true,
       "wants_video": true,
       "summary": "Records a few seconds of you, then plays it back."
     }

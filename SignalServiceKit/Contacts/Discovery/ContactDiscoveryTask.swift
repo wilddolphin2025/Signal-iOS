@@ -50,16 +50,33 @@ final class ContactDiscoveryTaskQueueImpl: ContactDiscoveryTaskQueue {
             return []
         }
 
+        // Gateway 555 numbers are registered in this client, not on CDSI.
+        let gatewayE164s = Set(e164s.filter { SignalGatewayContacts.isGatewayNumber($0.stringValue) })
+        let remoteE164s = e164s.subtracting(gatewayE164s)
+
+        var registeredRecipients = [SignalRecipient]()
+        if !gatewayE164s.isEmpty {
+            registeredRecipients = await db.awaitableWrite { tx in
+                SignalGatewayRegistrar.registerAll(tx: tx).filter { recipient in
+                    recipient.phoneNumber.flatMap { E164($0.stringValue) }.map(gatewayE164s.contains) ?? false
+                }
+            }
+        }
+        if remoteE164s.isEmpty {
+            return registeredRecipients
+        }
+
         let discoveryResults = try await ContactDiscoveryV2Operation(
             db: db,
-            e164sToLookup: e164s,
+            e164sToLookup: remoteE164s,
             mode: mode,
             udManager: udManager,
             connectionImpl: libsignalNet,
             remoteAttestationAuthFetcher: remoteAttestationAuthFetcher,
         ).perform()
 
-        return try await self.processResults(requestedPhoneNumbers: e164s, discoveryResults: discoveryResults)
+        let remoteRecipients = try await self.processResults(requestedPhoneNumbers: remoteE164s, discoveryResults: discoveryResults)
+        return registeredRecipients + remoteRecipients
     }
 
     private func processResults(

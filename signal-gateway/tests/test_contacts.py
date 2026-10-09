@@ -26,11 +26,32 @@ class ContactCatalogTests(unittest.TestCase):
         for e164 in e164s:
             self.assertTrue(re.fullmatch(r"\+[1-9][0-9]{7,14}", e164), e164)
 
+    def test_signal_registration_fields(self) -> None:
+        expected = [
+            ("echo", "Echo", "+15551111001", "1001"),
+            ("videoecho", "Video Echo", "+15551111002", "1002"),
+            ("prerecorded", "Prerecorded", "+15551111003", "1003"),
+            ("recordandplayback", "Record and Playback", "+15551111004", "1004"),
+        ]
+        actual = [
+            (c["id"], c["display_name"], c["e164"], c["short_number"])
+            for c in CONTACTS["contacts"]
+        ]
+        self.assertEqual(actual, expected)
+        for contact in CONTACTS["contacts"]:
+            self.assertTrue(contact["registered"])
+            self.assertTrue(contact["aci"])
+            self.assertTrue(contact["pni"])
+            self.assertNotEqual(contact["aci"], contact["pni"])
+
     def test_swift_catalog_stays_in_sync(self) -> None:
         for contact in CONTACTS["contacts"]:
             self.assertIn(f'id: "{contact["id"]}"', SWIFT)
             self.assertIn(f'e164: "{contact["e164"]}"', SWIFT)
             self.assertIn(f'shortNumber: "{contact["short_number"]}"', SWIFT)
+            self.assertIn(f'displayName: "{contact["display_name"]}"', SWIFT)
+            self.assertIn(contact["aci"], SWIFT)
+            self.assertIn(contact["pni"], SWIFT)
 
     def test_host(self) -> None:
         self.assertEqual(CONTACTS["host"], "rtc.wilddolphin.us")

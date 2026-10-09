@@ -2287,6 +2287,7 @@ extension AppSetup.FinalContinuation {
             sskEnvironment.donationReceiptCredentialRedemptionJobQueue.start(appContext: appContext)
             sskEnvironment.smJobQueuesRef.incomingContactSyncJobQueue.start(appContext: appContext)
             sskEnvironment.smJobQueuesRef.sendGiftBadgeJobQueue.start(appContext: appContext)
+            SignalGatewayRegistrar.registerAllWhenReady()
         }
     }
 

@@ -26,13 +26,9 @@ SSH_OPTS=(-i "${KEY}" -p "${PORT}" -o BatchMode=yes -o IdentitiesOnly=yes -o Str
 REMOTE="${USER}@${HOST}"
 
 echo "[deploy] sync to ${REMOTE}:${REMOTE_DIR}"
-ssh "${SSH_OPTS[@]}" "${REMOTE}" "mkdir -p '${REMOTE_DIR}'"
-rsync -az --delete \
-  -e "ssh ${SSH_OPTS[*]}" \
-  --exclude '.venv' \
-  --exclude '__pycache__' \
-  --exclude 'media/recordings' \
-  "${ROOT}/" "${REMOTE}:${REMOTE_DIR}/"
+ssh "${SSH_OPTS[@]}" "${REMOTE}" "rm -rf '${REMOTE_DIR}' && mkdir -p '${REMOTE_DIR}'"
+tar -C "${ROOT}" --exclude '.venv' --exclude '__pycache__' --exclude 'media/recordings' -czf - . \
+  | ssh "${SSH_OPTS[@]}" "${REMOTE}" "tar -C '${REMOTE_DIR}' -xzf -"
 
 echo "[deploy] install"
 ssh "${SSH_OPTS[@]}" "${REMOTE}" "bash '${REMOTE_DIR}/install.sh'"

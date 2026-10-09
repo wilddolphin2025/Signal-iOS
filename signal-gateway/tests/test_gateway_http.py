@@ -30,6 +30,10 @@ class GatewayHttpTests(AioHTTPTestCase):
             body["contacts"],
             ["echo", "videoecho", "prerecorded", "recordandplayback"],
         )
+        self.assertEqual(
+            body["registered"],
+            ["+15551111001", "+15551111002", "+15551111003", "+15551111004"],
+        )
 
     async def test_contact_lookup_by_number(self) -> None:
         resp = await self.client.get("/contacts/1002")
@@ -37,6 +41,8 @@ class GatewayHttpTests(AioHTTPTestCase):
         body = await resp.json()
         self.assertEqual(body["id"], "videoecho")
         self.assertEqual(body["e164"], "+15551111002")
+        self.assertTrue(body["registered"])
+        self.assertEqual(body["aci"], "A07D1002-E570-4000-8000-000015551002")
 
     async def test_unknown_contact(self) -> None:
         resp = await self.client.get("/contacts/9999")

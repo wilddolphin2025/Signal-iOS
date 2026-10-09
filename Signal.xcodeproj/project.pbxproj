@@ -931,7 +931,9 @@
 		50E39E0E30225D67008E6619 /* GroupStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E39E0D30225D67008E6619 /* GroupStore.swift */; };
 		50E42FEA2C1BA3B900554BD6 /* CallHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E42FE92C1BA3B900554BD6 /* CallHTTPClient.swift */; };
 		A07DC0DE0001000100000002 /* SignalGatewayContacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07DC0DE0001000100000001 /* SignalGatewayContacts.swift */; };
+		A07DC0DE0001000100000008 /* SignalGatewayRegistrar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07DC0DE0001000100000007 /* SignalGatewayRegistrar.swift */; };
 		A07DC0DE0001000100000004 /* SignalGatewayContactsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07DC0DE0001000100000003 /* SignalGatewayContactsTest.swift */; };
+		A07DC0DE000100010000000A /* SignalGatewayRegistrarTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07DC0DE0001000100000009 /* SignalGatewayRegistrarTest.swift */; };
 		A07DC0DE0001000100000006 /* GatewayCallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07DC0DE0001000100000005 /* GatewayCallViewController.swift */; };
 		50E458AE3059B7320074446D /* AuthCredentialSalt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E458AD3059B7320074446D /* AuthCredentialSalt.swift */; };
 		50E5E4B129932D9B00E15A1C /* DeviceMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E5E4B029932D9B00E15A1C /* DeviceMessage.swift */; };
@@ -5328,7 +5330,9 @@
 		50E42FE52C1B9EB900554BD6 /* CallLinkState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallLinkState.swift; sourceTree = "<group>"; };
 		50E42FE92C1BA3B900554BD6 /* CallHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallHTTPClient.swift; sourceTree = "<group>"; };
 		A07DC0DE0001000100000001 /* SignalGatewayContacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalGatewayContacts.swift; sourceTree = "<group>"; };
+		A07DC0DE0001000100000007 /* SignalGatewayRegistrar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalGatewayRegistrar.swift; sourceTree = "<group>"; };
 		A07DC0DE0001000100000003 /* SignalGatewayContactsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalGatewayContactsTest.swift; sourceTree = "<group>"; };
+		A07DC0DE0001000100000009 /* SignalGatewayRegistrarTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalGatewayRegistrarTest.swift; sourceTree = "<group>"; };
 		A07DC0DE0001000100000005 /* GatewayCallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayCallViewController.swift; sourceTree = "<group>"; };
 		50E458AD3059B7320074446D /* AuthCredentialSalt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthCredentialSalt.swift; sourceTree = "<group>"; };
 		50E5E4B029932D9B00E15A1C /* DeviceMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceMessage.swift; sourceTree = "<group>"; };
@@ -14997,6 +15001,7 @@
 				D9AA379E2A86CA3F0088EFFB /* Individual */,
 				50E42FE92C1BA3B900554BD6 /* CallHTTPClient.swift */,
 				A07DC0DE0001000100000001 /* SignalGatewayContacts.swift */,
+				A07DC0DE0001000100000007 /* SignalGatewayRegistrar.swift */,
 				501F10FF2C7FD688008FC0DD /* CallLinkRecord.swift */,
 				501F11012C7FD999008FC0DD /* CallLinkRecordStore.swift */,
 				50E42FE52C1B9EB900554BD6 /* CallLinkState.swift */,
@@ -15026,6 +15031,7 @@
 				D9D321692A8AC9B0004FC110 /* OutgoingGroupCallUpdateMessageTest.swift */,
 				F945FE4C298481EA00C835C7 /* RingrtcFieldTrialsTest.swift */,
 				A07DC0DE0001000100000003 /* SignalGatewayContactsTest.swift */,
+				A07DC0DE0001000100000009 /* SignalGatewayRegistrarTest.swift */,
 			);
 			path = Calls;
 			sourceTree = "<group>";
@@ -19714,6 +19720,7 @@
 				50D3136F2BFFE9370023EDCC /* CallEventInserter.swift in Sources */,
 				50E42FEA2C1BA3B900554BD6 /* CallHTTPClient.swift in Sources */,
 				A07DC0DE0001000100000002 /* SignalGatewayContacts.swift in Sources */,
+				A07DC0DE0001000100000008 /* SignalGatewayRegistrar.swift in Sources */,
 				50A4AC622C111FAE00D89C8E /* CallLinkAuthCredential.swift in Sources */,
 				501F11002C7FD688008FC0DD /* CallLinkRecord.swift in Sources */,
 				501F11022C7FD999008FC0DD /* CallLinkRecordStore.swift in Sources */,
@@ -20926,6 +20933,7 @@
 				F9426259289B1B5500460798 /* RemoteConfigManagerTests.swift in Sources */,
 				F945FE4D298481EA00C835C7 /* RingrtcFieldTrialsTest.swift in Sources */,
 				A07DC0DE0001000100000004 /* SignalGatewayContactsTest.swift in Sources */,
+				A07DC0DE000100010000000A /* SignalGatewayRegistrarTest.swift in Sources */,
 				F942624E289B1B5500460798 /* SDSDatabaseStorageObservationTest.swift in Sources */,
 				F942624B289B1B5500460798 /* SDSDatabaseStorageTest.swift in Sources */,
 				F942624A289B1B5500460798 /* SDSKeyValueStoreTest.swift in Sources */,

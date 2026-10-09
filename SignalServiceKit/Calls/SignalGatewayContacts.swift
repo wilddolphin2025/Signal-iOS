@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import LibSignalClient
 
 /// Built-in RTC test contacts hosted at rtc.wilddolphin.us.
 ///
@@ -19,6 +20,8 @@ public enum SignalGatewayContacts {
         public let displayName: String
         public let shortNumber: String
         public let e164: String
+        public let aci: Aci
+        public let pni: Pni
         public let wantsVideo: Bool
         public let summary: String
 
@@ -31,7 +34,7 @@ public enum SignalGatewayContacts {
         }
 
         public var address: SignalServiceAddress {
-            SignalServiceAddress(phoneNumber: e164)
+            SignalServiceAddress(serviceId: aci, phoneNumber: e164)
         }
 
         func matches(_ query: String) -> Bool {
@@ -52,6 +55,8 @@ public enum SignalGatewayContacts {
             displayName: "Echo",
             shortNumber: "1001",
             e164: "+15551111001",
+            aci: Aci(fromUUID: UUID(uuidString: "A07D1001-E570-4000-8000-000015551001")!),
+            pni: Pni(fromUUID: UUID(uuidString: "A07D1001-E570-5000-8000-000015551001")!),
             wantsVideo: false,
             summary: "Audio loopback. Speak and hear yourself come back.",
         ),
@@ -60,6 +65,8 @@ public enum SignalGatewayContacts {
             displayName: "Video Echo",
             shortNumber: "1002",
             e164: "+15551111002",
+            aci: Aci(fromUUID: UUID(uuidString: "A07D1002-E570-4000-8000-000015551002")!),
+            pni: Pni(fromUUID: UUID(uuidString: "A07D1002-E570-5000-8000-000015551002")!),
             wantsVideo: true,
             summary: "Audio and video loopback. Check camera and microphone.",
         ),
@@ -68,6 +75,8 @@ public enum SignalGatewayContacts {
             displayName: "Prerecorded",
             shortNumber: "1003",
             e164: "+15551111003",
+            aci: Aci(fromUUID: UUID(uuidString: "A07D1003-E570-4000-8000-000015551003")!),
+            pni: Pni(fromUUID: UUID(uuidString: "A07D1003-E570-5000-8000-000015551003")!),
             wantsVideo: true,
             summary: "Plays a short prerecorded audio/video clip.",
         ),
@@ -76,14 +85,37 @@ public enum SignalGatewayContacts {
             displayName: "Record and Playback",
             shortNumber: "1004",
             e164: "+15551111004",
+            aci: Aci(fromUUID: UUID(uuidString: "A07D1004-E570-4000-8000-000015551004")!),
+            pni: Pni(fromUUID: UUID(uuidString: "A07D1004-E570-5000-8000-000015551004")!),
             wantsVideo: true,
             summary: "Records a few seconds of you, then plays it back.",
         ),
     ]
 
     public static func contact(matching address: SignalServiceAddress) -> Contact? {
+        if let serviceId = address.serviceId, let match = contact(matchingServiceId: serviceId) {
+            return match
+        }
         guard let number = address.phoneNumber else { return nil }
         return contact(matchingNumber: number)
+    }
+
+    public static func contact(matchingServiceId serviceId: ServiceId) -> Contact? {
+        if let aci = serviceId as? Aci {
+            return all.first { $0.aci == aci }
+        }
+        if let pni = serviceId as? Pni {
+            return all.first { $0.pni == pni }
+        }
+        return nil
+    }
+
+    public static func isGatewayNumber(_ number: String) -> Bool {
+        contact(matchingNumber: number) != nil
+    }
+
+    public static func isGatewayServiceId(_ serviceId: ServiceId) -> Bool {
+        contact(matchingServiceId: serviceId) != nil
     }
 
     public static func contact(matchingNumber number: String) -> Contact? {

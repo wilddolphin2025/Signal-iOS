@@ -201,6 +201,13 @@ def _json_response(data: Any, status: int = 200) -> web.Response:
     return web.json_response(data, status=status)
 
 
+def signal_contact(contact: dict[str, Any]) -> dict[str, Any]:
+    payload = dict(contact)
+    payload["registered"] = True
+    payload.setdefault("system", "signal")
+    return payload
+
+
 async def handle_health(request: web.Request) -> web.Response:
     catalog = request.app["catalog"]
     return _json_response(
@@ -210,13 +217,20 @@ async def handle_health(request: web.Request) -> web.Response:
             "host": catalog.get("host"),
             "aiortc": AIORTC_AVAILABLE,
             "contacts": [c["id"] for c in catalog["contacts"]],
+            "registered": [c["e164"] for c in catalog["contacts"]],
             "time": int(time.time()),
         }
     )
 
 
 async def handle_contacts(request: web.Request) -> web.Response:
-    return _json_response(request.app["catalog"])
+    catalog = request.app["catalog"]
+    return _json_response(
+        {
+            **catalog,
+            "contacts": [signal_contact(contact) for contact in catalog["contacts"]],
+        }
+    )
 
 
 async def handle_contact(request: web.Request) -> web.Response:
@@ -225,7 +239,7 @@ async def handle_contact(request: web.Request) -> web.Response:
     contact = contact_by_id(catalog, key) or contact_by_number(catalog, key)
     if contact is None:
         return _json_response({"error": "unknown contact", "key": key}, status=404)
-    return _json_response(contact)
+    return _json_response(signal_contact(contact))
 
 
 async def handle_index(request: web.Request) -> web.Response:

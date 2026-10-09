@@ -19,6 +19,12 @@ final class SignalGatewayContactsTest: XCTestCase {
             "+15551111003",
             "+15551111004",
         ])
+        XCTAssertEqual(SignalGatewayContacts.all.map(\.displayName), [
+            "Echo",
+            "Video Echo",
+            "Prerecorded",
+            "Record and Playback",
+        ])
     }
 
     func testLookupByE164AndExtension() {
@@ -37,6 +43,22 @@ final class SignalGatewayContactsTest: XCTestCase {
     func testE164IsStructurallyValid() {
         for contact in SignalGatewayContacts.all {
             XCTAssertNotNil(E164(contact.e164), contact.e164)
+        }
+    }
+
+    func testStableServiceIds() {
+        let acis = Set(SignalGatewayContacts.all.map(\.aci))
+        let pnis = Set(SignalGatewayContacts.all.map(\.pni))
+        XCTAssertEqual(acis.count, 4)
+        XCTAssertEqual(pnis.count, 4)
+        XCTAssertEqual(
+            SignalGatewayContacts.contact(matching: SignalGatewayContacts.all[0].address)?.id,
+            "echo",
+        )
+        for contact in SignalGatewayContacts.all {
+            XCTAssertTrue(SignalGatewayContacts.isGatewayServiceId(contact.aci))
+            XCTAssertTrue(SignalGatewayContacts.isGatewayServiceId(contact.pni))
+            XCTAssertTrue(SignalGatewayContacts.isGatewayNumber(contact.e164))
         }
     }
 }
