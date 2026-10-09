@@ -88,6 +88,7 @@ nginx -t
 systemctl daemon-reload
 systemctl enable --now nginx
 systemctl enable --now signal-gateway.service signal-cli.service signal-bridge.service
+systemctl restart signal-gateway.service signal-cli.service signal-bridge.service
 systemctl reload nginx
 
 echo
