@@ -77,7 +77,12 @@ final class IndividualCallService: CallServiceStateObserver {
         call.individualCall.createOrUpdateCallInteractionAsync(callType: .outgoingIncomplete)
 
         guard let serviceId = call.individualCall.remoteAddress.serviceId else {
-            owsFailDebug("service id not available")
+            handleFailedCall(
+                failedCall: call,
+                error: OWSAssertionError("service id not available"),
+                shouldResetUI: true,
+                shouldResetRingRTC: true,
+            )
             return
         }
 

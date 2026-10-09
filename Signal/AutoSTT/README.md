@@ -14,8 +14,10 @@ Requires iOS 26+. The language-model polish needs an Apple Intelligence iPhone (
 | `OnDeviceSTTSession.swift` | Recognition session (mic or file), model install with fallback, language detection |
 | `OnDeviceSpeechIntelligence.swift` | Rule-based smart formatting, Apple language-model polish, text-to-speech |
 | `AutoSTTViewController.swift` | Dictate / Transcript sheet |
-| `VoiceCommandGrammar.swift` | Hands-free command vocabulary (en/es/ru) and parser |
-| `VoicePrompts.swift` | Everything the assistant says back, per language |
+| `VoiceCommandGrammar.swift` | Fast-path parser for cancel, hang up, answer, and fallback if the model is off |
+| `VoiceAssistant.swift` | On-device AFM session: STT text → action + spoken reply |
+| `VoicePrompts.swift` | Canned replies for cancel, enroll, lookup, and model-off fallback |
+| `VoiceScenarios.md` | Live QA script for STT / AI / TTS |
 | `VoiceContactMatcher.swift` | Spoken-name search: phonetic Latin keys, Russian case endings, fuzzy match |
 | `VoiceCommandService.swift` | Listener lifecycle, dialogs, call control, echo suppression, announcements |
 | `VoiceCommandBanner.swift` | Chat list mic button and "heard / replied" banner |
@@ -73,26 +75,28 @@ The banner at the bottom of the chat list shows what was heard and the reply; ta
 
 On every launch Signal says **“Please say Hey Signal.”** The first voice that answers is saved as a fingerprint (`AutoSTT/voice-fingerprint.bin` in the app container). Later commands are accepted only from that voice. **Settings → Voice Commands → Clear Voice Fingerprint** drops the active lock so someone else can enroll; the previous print is copied to `voice-fingerprint.cleared.bin` and is not deleted. If that same person says Hey Signal again, the saved file is restored.
 
+Speech is interpreted by the **on-device Apple model** (AFM 3). You do not need exact menu phrases: “Can you get Taras on the phone?” is the same action as “Call Taras.” The model is primed with Signal’s commands, safety rules, and the current situation, and it answers in conversational speech which is then spoken. Cancel, hang up, answer, and decline stay on a fast path so they do not wait for the model.
+
 Design rules (for someone who can speak and listen but not touch the phone):
 - Every action is answered aloud, and every reply ends with what to say next.
-- Dialing starts after a short spoken countdown ("Calling Anna. Say cancel to stop."), so a misheard name never rings anyone.
-- Outside calls no wake word is needed; unrecognized speech is ignored silently (no nagging at TV or conversation).
+- Dialing starts after a short spoken countdown, so a misheard name never rings anyone.
+- Outside calls no wake word is needed; chatter is ignored silently.
 - During a call every command needs **"Signal, …"**, so normal conversation is never acted on.
 - An incoming call is announced with the caller's name, and "answer" / "decline" work without the wake word.
 - If nothing is said for 12 seconds during a question, it gives up politely.
 
-| Say | Does |
+| You can say, among other phrasings | Does |
 |---|---|
-| "Call Anna", "Dial Mom", "Phone John Smith" | Finds the contact, counts down, calls |
-| "Call plus 1 6 5 0 4 5 0 8 0 2 5", "Dial a number" | Reads the number back, asks country if needed, then yes / say it again / save as a name |
+| "Call Anna", "Can you get Mom on the phone?" | Finds the contact, counts down, calls |
+| "Dial plus 1 6 5 0…", "Call a number" | Reads the number back, looks it up on Signal, then yes / say it again / save as a name |
 | "Video call Alex", "Call Masha on video" | Video call |
-| "Group call Family", "Call the group Work" | Opens the group call and joins it |
-| "Call" (no name) | "Who should I call?" then say the name |
+| "Group call Family" | Opens the group call and joins it |
+| "Call" (no name) | Asks who, then you can just say the name |
 | "Call back", "Redial" | Calls the most recent call |
-| "Missed calls", "Who called?" | Reads the last 3 missed calls with times |
+| "Missed calls", "Who called?" | Reads recent missed calls |
 | "Answer" / "Decline", "Who's calling?" | Incoming calls |
-| "Signal, hang up" / "end the call" | Ends the call (or cancels a pending dial) |
-| "Signal, mute" / "unmute" / "microphone off" | Microphone |
+| "Cancel" / "Signal, hang up" | Immediately “Cancelling call,” then stops the dial or hang up |
+| "Signal, mute" / "kill the mic" / "unmute" | Microphone |
 | "Signal, hold" / "pause" / "resume" | Hold (1:1); in group calls mutes mic and camera instead |
 | "Signal, speaker on/off", "earpiece" | Audio route (headsets keep the audio) |
 | "Signal, camera on/off", "switch camera" | Video |
@@ -101,7 +105,10 @@ Design rules (for someone who can speak and listen but not touch the phone):
 | "Can you hear me?", "Are you there?", "Hello?" | "I hear you. Please ask with a command, like: call and a name." Answered even while paused; during a call only after "Signal, …" |
 | "Hey Signal" (alone) | First time: saves your voice. Later: “Yes?”, then the next sentence counts as a command |
 | "Repeat what you just said", "Say that again" | Plays back Signal's last spoken reply |
-| "Help", "Cancel" | |
+| "What time is it now?", "What date?" | Speaks the clock or calendar |
+| "Is the internet available?", "Am I online?" | Yes or no; if yes, you can say search for something |
+| "Search for the capital of France" | Short spoken lookup when online |
+| "What can you do?", "Help" | Conversational spoken help for the current situation |
 | "Stop listening" / "Hey Signal, wake up" | Sleep and wake |
 
 **Finding a contact.** One clear match: countdown and call. Unsure match: "Did you mean Anna Lee? Say yes or no."
@@ -112,10 +119,12 @@ Names match across scripts and cases ("Masha" = "Маша" = "Маше", "Ива
 Spanish and Russian work the same way ("Llama a Juan", "Oye Signal, cuelga", "Позвони Маше", "Сигнал, громкая связь"). The command language is the AutoSTT **Spoken Language** (Automatic = the iPhone's first supported language).
 
 **Test**
-1. Turn it on and wait for "Voice commands on…".
-2. Say "Call" and a contact name, then say "cancel" during the countdown. Expected reply: "Canceled."
-3. Say "Call" and the name again and let it dial. While it rings, say "Signal, status", then "Signal, speaker on".
-4. Once connected, say "Signal, mute" and confirm the other side stops hearing you. Then say "Signal, hang up".
+
+Use `VoiceScenarios.md` for the full STT / AI / TTS pass. A short check:
+
+1. Turn it on, say Hey Signal, then “Can you get [contact] on the phone?”
+2. During the countdown say “Cancel.” Expected: immediate “Cancelling call.”
+3. Repeat the call, let it ring, say “Signal, mute”, then “Signal, hang up.”
 5. Have someone call you and say "Answer".
 6. Lock the screen and say "Hey Signal, missed calls".
 7. In the Xcode console, filter on `Voice commands` to see each parsed command.
@@ -180,8 +189,25 @@ With the iPhone connected (USB or same Wi-Fi as a paired Mac), run:
 
 **Signing and build**
 - **The bundle ID prefix is `us.wilddolphin`** (`SIGNAL_BUNDLEID_PREFIX`), and every target uses team `PPZTNTHDFC`.
-- **Development entitlements drop three capabilities** your team can't provision: Apple Pay (`merchant.org.signalfoundation` belongs to Signal), carrier-constrained networking (Apple has to grant it) and Wi-Fi Aware. Donations via Apple Pay won't work in this build. The App Store entitlement files are untouched.
+- **Development entitlements drop three capabilities** your team can't provision: Apple Pay (`merchant.org.signalfoundation` belongs to Signal), carrier-constrained networking (Apple has to grant it) and Wi-Fi Aware. Donations via Apple Pay won't work in this build. App Store entitlements match that set, with `aps-environment` set to `production`.
+- **The home-screen name is Signal+AI.** Bundle ID stays `us.wilddolphin.signal`; the executable is still named Signal.
 - **"No Accounts" during the build** means Xcode has no Apple ID signed in (step 1 of "Build and install").
+- **TestFlight** needs that same Apple ID signed into Xcode **and** App Store Connect for team `PPZTNTHDFC`, plus an Apple Distribution certificate (Xcode creates one on first export). The App Store Connect app is **Signal+AI**, bundle `us.wilddolphin.signal`. Then from the repo root:
+
+```bash
+# Archive (skip if build/SignalPlusAI.xcarchive already exists)
+xcodebuild -workspace Signal.xcworkspace -scheme Signal \
+  -configuration "App Store Release" -destination 'generic/platform=iOS' \
+  -allowProvisioningUpdates -derivedDataPath build/TFArchiveDD \
+  archive -archivePath build/SignalPlusAI.xcarchive
+
+# Sign, upload, and let Xcode bump the build number
+xcodebuild -exportArchive -archivePath build/SignalPlusAI.xcarchive \
+  -exportOptionsPlist fastlane/ExportOptions-TestFlight.plist \
+  -exportPath build/TestFlight -allowProvisioningUpdates
+```
+
+  After processing (often 5–15 minutes), open [App Store Connect](https://appstoreconnect.apple.com) → **Signal+AI** → **TestFlight** → Internal Testing, add testers, and install from the TestFlight app.
 - **Reinstalling over the app keeps your registration;** deleting the app erases it.
 - **The Debug build may connect to Signal's staging servers,** so registration can behave differently from the App Store app.
 - **Commit the signing changes separately** from the feature (`chore: local device signing` and `feat: on-device AutoSTT`).

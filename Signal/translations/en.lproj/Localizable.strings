@@ -11135,7 +11135,7 @@
 "VOICE_COMMANDS_BANNER_A11Y_HINT" = "Double-tap to pause or resume listening.";
 
 /* Shown on the chat list while voice commands listen and nothing was heard yet. */
-"VOICE_COMMANDS_BANNER_HINT" = "Say “Call” and a name. Say “Help” for more.";
+"VOICE_COMMANDS_BANNER_HINT" = "Talk to Signal. Ask it to call someone, or say Help.";
 
 /* Accessibility label for the chat list button that turns voice commands off. */
 "VOICE_COMMANDS_BUTTON_TURN_OFF" = "Turn off voice commands";
@@ -11168,7 +11168,7 @@
 "VOICE_COMMANDS_SETTINGS_ENABLE" = "Hands-Free Calling";
 
 /* Footer explaining how hands-free voice commands work. */
-"VOICE_COMMANDS_SETTINGS_FOOTER" = "On launch Signal asks “Please say Hey Signal”. The first voice that answers becomes the only one that can give commands. Clearing the fingerprint keeps a copy on this iPhone. During a call, start with “Signal”, for example “Signal, mute”.";
+"VOICE_COMMANDS_SETTINGS_FOOTER" = "On launch Signal asks “Please say Hey Signal”. The first voice that answers becomes the only one that can give commands. After that, speak naturally — the on-device assistant interprets paraphrases. Clearing the fingerprint keeps a copy on this iPhone. During a call, start with “Signal”, for example “Signal, mute”.";
 
 /* Header for hands-free voice command settings. */
 "VOICE_COMMANDS_SETTINGS_HEADER" = "Voice Commands";

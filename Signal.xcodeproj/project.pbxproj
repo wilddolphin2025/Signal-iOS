@@ -17,6 +17,7 @@
 		423884E2E60ED4B168C1E044 /* VoiceContactMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AD4ADF820B6AB8E9EB6A0A /* VoiceContactMatcher.swift */; };
 		09922D47172A37FD81D0A02D /* VoicePrompts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D4FA790DE48A33BBACDCF7 /* VoicePrompts.swift */; };
 		FA041BA87F0082D506511B03 /* VoiceCommandGrammar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01436FF736BD77408D58491 /* VoiceCommandGrammar.swift */; };
+		7D2F9B18E4C04A6B91D3E802 /* VoiceAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8E1A92B0D347E1A8F26C01 /* VoiceAssistant.swift */; };
 		040277FA303DCFA6009C1468 /* LocalFileBackupAttachmentRestoreProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040277F9303DCF9B009C1468 /* LocalFileBackupAttachmentRestoreProgress.swift */; };
 		040277FE303DE4F2009C1468 /* ChatListViewController+LocalFileBackupRestoreProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040277FD303DE4F2009C1468 /* ChatListViewController+LocalFileBackupRestoreProgressView.swift */; };
 		040506F82F7EEF3B0078B769 /* RemoteReleaseNotesFetchingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040506F72F7EEF290078B769 /* RemoteReleaseNotesFetchingManager.swift */; };
@@ -4307,6 +4308,7 @@
 		86AD4ADF820B6AB8E9EB6A0A /* VoiceContactMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceContactMatcher.swift; sourceTree = "<group>"; };
 		79D4FA790DE48A33BBACDCF7 /* VoicePrompts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoicePrompts.swift; sourceTree = "<group>"; };
 		B01436FF736BD77408D58491 /* VoiceCommandGrammar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCommandGrammar.swift; sourceTree = "<group>"; };
+		4C8E1A92B0D347E1A8F26C01 /* VoiceAssistant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceAssistant.swift; sourceTree = "<group>"; };
 		040277F9303DCF9B009C1468 /* LocalFileBackupAttachmentRestoreProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalFileBackupAttachmentRestoreProgress.swift; sourceTree = "<group>"; };
 		040277FD303DE4F2009C1468 /* ChatListViewController+LocalFileBackupRestoreProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatListViewController+LocalFileBackupRestoreProgressView.swift"; sourceTree = "<group>"; };
 		040506F72F7EEF290078B769 /* RemoteReleaseNotesFetchingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteReleaseNotesFetchingManager.swift; sourceTree = "<group>"; };
@@ -8756,6 +8758,7 @@
 				86AD4ADF820B6AB8E9EB6A0A /* VoiceContactMatcher.swift */,
 				79D4FA790DE48A33BBACDCF7 /* VoicePrompts.swift */,
 				B01436FF736BD77408D58491 /* VoiceCommandGrammar.swift */,
+				4C8E1A92B0D347E1A8F26C01 /* VoiceAssistant.swift */,
 			);
 			path = AutoSTT;
 			sourceTree = "<group>";
@@ -18605,6 +18608,7 @@
 				423884E2E60ED4B168C1E044 /* VoiceContactMatcher.swift in Sources */,
 				09922D47172A37FD81D0A02D /* VoicePrompts.swift in Sources */,
 				FA041BA87F0082D506511B03 /* VoiceCommandGrammar.swift in Sources */,
+				7D2F9B18E4C04A6B91D3E802 /* VoiceAssistant.swift in Sources */,
 				D91174562E8F35C1009EB756 /* AccountEntropyPoolTextView.swift in Sources */,
 				88E728FF25F0241100A2E4A4 /* AccountSettingsViewController.swift in Sources */,
 				349439D624360C30001045F7 /* AddGroupMembersViewController.swift in Sources */,
@@ -21342,6 +21346,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = "SignalNSE/SignalNSE-AppStore.entitlements";
+				CURRENT_PROJECT_VERSION = 202610082;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -21997,6 +22002,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = "SignalShareExtension/SignalShareExtension-AppStore.entitlements";
+				CURRENT_PROJECT_VERSION = 202610082;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -22169,6 +22175,7 @@
 				LLVM_LTO = NO;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(SIGNAL_BUNDLEID_PREFIX).signal";
+				INFOPLIST_KEY_CFBundleDisplayName = "Signal+AI";
 				PRODUCT_NAME = Signal;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;
@@ -22431,6 +22438,7 @@
 				LLVM_LTO = NO;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(SIGNAL_BUNDLEID_PREFIX).signal";
+				INFOPLIST_KEY_CFBundleDisplayName = "Signal+AI";
 				PRODUCT_NAME = Signal;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;
@@ -22803,6 +22811,7 @@
 				LLVM_LTO = NO;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(SIGNAL_BUNDLEID_PREFIX).signal";
+				INFOPLIST_KEY_CFBundleDisplayName = "Signal+AI";
 				PRODUCT_NAME = Signal;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;
@@ -22823,7 +22832,8 @@
 				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Signal/Signal-AppStore.entitlements";
-				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 202610082;
 				DEVELOPMENT_TEAM = PPZTNTHDFC;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_SOURCE_FILE_NAMES[arch=*]" = Signal/test/Assets/input_video.mp4;
@@ -22844,6 +22854,7 @@
 				LLVM_LTO = NO;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(SIGNAL_BUNDLEID_PREFIX).signal";
+				INFOPLIST_KEY_CFBundleDisplayName = "Signal+AI";
 				PRODUCT_NAME = Signal;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;

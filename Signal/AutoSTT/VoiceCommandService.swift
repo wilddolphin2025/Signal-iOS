@@ -66,6 +66,8 @@ final class VoiceCommandService: NSObject {
         case awaitingNumber(video: Bool, attempts: Int)
         case confirmingNumber(e164: String, video: Bool)
         case awaitingCountry(digits: String, video: Bool)
+        case lookingUp(VoiceContact, video: Bool)
+        case awaitingSearch
     }
 
     private var dialog = Dialog.none {
@@ -73,6 +75,8 @@ final class VoiceCommandService: NSObject {
     }
     private var dialogTimeout: Task<Void, Never>?
     private var countdown: Task<Void, Never>?
+    private var lookupTask: Task<Void, Never>?
+    private var assistantTask: Task<Void, Never>?
     private var addressedUntil = Date.distantPast
     private var isSleeping = false { didSet { status.isSleeping = isSleeping } }
 
@@ -83,6 +87,8 @@ final class VoiceCommandService: NSObject {
     private var speakingSince: Date?
     private var lastSpeech: (start: Date, end: Date, text: String)?
     private var afterSpeaking: (() -> Void)?
+    /// Skip the "Call ended." prompt after a voice cancel, so it doesn't talk over "Cancelling call."
+    private var suppressCallEnded = false
 
     // MARK: Contacts and calls
 
@@ -135,7 +141,10 @@ final class VoiceCommandService: NSObject {
             didAskForHeySignalThisLaunch = false
         }
         startIfEnabled()
-        if !enabled { say(.off) }
+        if !enabled {
+            VoiceAssistant.shared.reset()
+            say(.off)
+        }
         NotificationCenter.default.post(name: .voiceCommandStatusDidChange, object: self)
     }
 
@@ -158,6 +167,7 @@ final class VoiceCommandService: NSObject {
         justEnrolled = false
         unlockedThisLaunch = false
         didAskForHeySignalThisLaunch = false
+        VoiceAssistant.shared.reset()
         Logger.info("Voice commands fingerprint cleared; archived copy kept on file")
         NotificationCenter.default.post(name: .voiceCommandStatusDidChange, object: self)
         if isEnabled { say(.fingerprintCleared) }
@@ -252,6 +262,7 @@ final class VoiceCommandService: NSObject {
             listenerStartedAt = Date()
             status.isListening = true
             Logger.info("Voice commands listening (\(inCall ? "in call" : "idle"), \(language))")
+            VoiceAssistant.shared.prewarm()
             askForHeySignalIfNeeded()
         } catch {
             Logger.warn("Voice commands couldn't start listening: \(error)")
@@ -481,13 +492,293 @@ final class VoiceCommandService: NSObject {
         let isStopWhileRingingOut = currentCall.map(isOutgoingRinging) == true && [.cancel, .hangUp, .no].contains(utterance.intent)
         let needsWakeWord = (inCall && !isStopWhileRingingOut) || (AutoSTTSettings.voiceRequiresWakeWord && !inDialog && !ringing)
         guard addressed || !needsWakeWord else { return }
-        if case .text = utterance.intent, !inDialog, !addressed { return }
+        let assistantReady = VoiceAssistant.shared.isAvailable
+        if !assistantReady, case .text = utterance.intent, !inDialog, !addressed { return }
 
         addressedUntil = .distantPast
         status.heard = text.trimmingCharacters(in: .whitespaces)
         dialogTimeout?.cancel()
-        if inDialog, handleDialog(utterance.intent) { return }
-        handleCommand(utterance.intent, addressed: addressed)
+        if isUrgentStop(utterance) || isDirectWorldQuestion(utterance.intent) {
+            if inDialog, handleDialog(utterance.intent) { return }
+            handleCommand(utterance.intent, addressed: addressed)
+            return
+        }
+        interpretWithAssistant(text, addressed: addressed, fallback: utterance)
+    }
+
+    /// Cancel / hang up / answer must not wait on the language model.
+    private func isUrgentStop(_ utterance: VoiceUtterance) -> Bool {
+        switch utterance.intent {
+        case .cancel, .hangUp:
+            return true
+        case .no:
+            if currentCall.map(isOutgoingRinging) == true { return true }
+            switch dialog {
+            case .countdown, .lookingUp: return true
+            default: return false
+            }
+        case .answer, .decline:
+            return currentCall.map(isIncomingRinging) ?? false
+        default:
+            return false
+        }
+    }
+
+    /// Time, date, internet, and search are answered from the clock/network, not the language model.
+    private func isDirectWorldQuestion(_ intent: VoiceIntent) -> Bool {
+        switch intent {
+        case .tellTime, .tellDate, .checkInternet, .search: return true
+        default: return false
+        }
+    }
+
+    private func shouldPreferWorldFallback(_ turn: VoiceAssistant.Turn, fallback: VoiceIntent) -> Bool {
+        guard isDirectWorldQuestion(fallback) else { return false }
+        switch turn.action {
+        case .ignore, .none, .help: return true
+        default: return false
+        }
+    }
+
+    private func worldQuestion(in text: String) -> VoiceIntent? {
+        let tokens = Set(VoiceCommandParser.tokenize(text))
+        if !tokens.isDisjoint(with: ["internet", "online", "conexion", "сеть"]) { return .checkInternet }
+        if tokens.contains("search") || tokens.contains("google") || tokens.contains("busca") || tokens.contains("найди") || tokens.contains("поищи") {
+            let parsed = VoiceCommandParser.parse(text, languageCode: language)
+            if case .search(let query) = parsed.intent { return .search(query) }
+            return .search(tokens.subtracting(["search", "for", "google", "look", "up", "busca", "buscar", "найди", "найти", "поищи", "поиск"]).joined(separator: " "))
+        }
+        if !tokens.isDisjoint(with: ["time", "hora", "час", "времени"]) { return .tellTime }
+        if !tokens.isDisjoint(with: ["date", "today", "fecha", "число", "дата"]) { return .tellDate }
+        if tokens.contains("day"), tokens.contains("it") || tokens.contains("today") { return .tellDate }
+        return nil
+    }
+
+    private var dialogSummary: String {
+        switch dialog {
+        case .none: "none"
+        case .awaitingName(let video, let groupsOnly, _):
+            groupsOnly ? "asking which group to call" : video ? "asking who to video call" : "asking who to call"
+        case .choosing(let list, _): "offering choices: \(list.map(\.name).joined(separator: ", "))"
+        case .confirming(let contact, _): "confirming contact \(contact.name)"
+        case .countdown(let contact, _): "about to call \(contact.name); user can cancel"
+        case .awaitingNumber: "asking for a phone number"
+        case .confirmingNumber(let e164, _): "confirming number \(e164)"
+        case .awaitingCountry: "asking which country the number is in"
+        case .lookingUp(let contact, _): "looking up \(contact.name) on Signal"
+        case .awaitingSearch: "asking what to search for"
+        }
+    }
+
+    private func interpretWithAssistant(_ text: String, addressed: Bool, fallback: VoiceUtterance) {
+        guard VoiceAssistant.shared.isAvailable else {
+            if dialog != .none, handleDialog(fallback.intent) { return }
+            handleCommand(fallback.intent, addressed: addressed)
+            return
+        }
+        loadDirectoryIfStale()
+        let context = VoiceAssistant.Context(
+            language: language,
+            dialog: dialogSummary,
+            inCall: currentCall != nil && !(currentCall.map(isIncomingRinging) ?? false),
+            incomingRing: currentCall.map(isIncomingRinging) ?? false,
+            outgoingRing: currentCall.map(isOutgoingRinging) ?? false,
+            lastPrompt: lastPrompt,
+            contacts: matcher.contacts.prefix(40).map(\.name),
+            addressed: addressed,
+        )
+        assistantTask?.cancel()
+        assistantTask = Task { [weak self] in
+            guard let self else { return }
+            let turn = await VoiceAssistant.shared.interpret(heard: text, context: context)
+            guard !Task.isCancelled else { return }
+            if let turn {
+                if self.shouldPreferWorldFallback(turn, fallback: fallback.intent) {
+                    self.handleCommand(fallback.intent, addressed: addressed)
+                } else {
+                    self.applyAssistant(turn, addressed: addressed, fallback: fallback)
+                }
+            } else if self.dialog != .none, self.handleDialog(fallback.intent) {
+                return
+            } else {
+                self.handleCommand(fallback.intent, addressed: addressed)
+            }
+        }
+    }
+
+    private func applyAssistant(_ turn: VoiceAssistant.Turn, addressed: Bool, fallback: VoiceUtterance) {
+        Logger.info("Voice assistant action=\(turn.action) name=\(turn.name) number=\(turn.number)")
+        switch turn.action {
+        case .ignore:
+            if isDirectWorldQuestion(fallback.intent) {
+                handleCommand(fallback.intent, addressed: addressed)
+            }
+            return
+        case .none, .help:
+            if isDirectWorldQuestion(fallback.intent) {
+                handleCommand(fallback.intent, addressed: addressed)
+                return
+            }
+            if let rescued = worldQuestion(in: status.heard) {
+                handleCommand(rescued, addressed: addressed)
+                return
+            }
+            if turn.action == .help, !turn.say.isEmpty {
+                speak(turn.say)
+            } else if turn.action == .none, !turn.say.isEmpty {
+                speak(turn.say)
+            } else if turn.action == .help {
+                say(.help(inCall: currentCall != nil))
+            } else if addressed {
+                say(.didntCatch)
+            }
+        case .call:
+            applyCall(name: turn.name, video: false, groupsOnly: false, spoken: turn.say)
+        case .videoCall:
+            applyCall(name: turn.name, video: true, groupsOnly: false, spoken: turn.say)
+        case .groupCall:
+            applyCall(name: turn.name, video: true, groupsOnly: true, spoken: turn.say)
+        case .callNumber:
+            let spokenNumber = turn.number.isEmpty ? turn.name : turn.number
+            if spokenNumber.isEmpty {
+                dialog = .awaitingNumber(video: false, attempts: 0)
+                speak(orCanned: turn.say, .askNumber)
+            } else {
+                handleNumber(spokenNumber, video: false, attempts: 0)
+            }
+        case .yes:
+            if handleDialog(.yes) { return }
+            speak(orCanned: turn.say, .didntCatch)
+        case .no:
+            if handleDialog(.no) { return }
+            speak(orCanned: turn.say, .didntCatch)
+        case .cancel:
+            if dialog != .none { abortOutgoingDial() } else { hangUp() }
+        case .hangUp:
+            hangUp()
+        case .answer:
+            answer()
+        case .decline:
+            decline()
+        case .mute:
+            guard let call = currentCall else { return say(.noCall) }
+            callService.updateIsLocalAudioMuted(isLocalAudioMuted: turn.on)
+            callService.callUIAdapter.setIsMuted(call: call, isMuted: turn.on)
+            speak(orCanned: turn.say, .muted(turn.on))
+        case .hold:
+            guard let call = currentCall else { return say(.noCall) }
+            setHeld(turn.on, call: call)
+        case .speaker:
+            guard let call = currentCall else { return say(.noCall) }
+            setSpeaker(turn.on, call: call)
+        case .camera:
+            guard let call = currentCall else { return say(.noCall) }
+            setCamera(turn.on, call: call)
+        case .flipCamera:
+            guard let call = currentCall else { return say(.noCall) }
+            flipCamera(call: call)
+        case .callBack:
+            callBack()
+        case .missed:
+            announceMissedCalls()
+        case .status:
+            guard let call = currentCall else { return say(.noCall) }
+            if turn.say.isEmpty { announceStatus(call) } else { speak(turn.say) }
+        case .join:
+            joinGroupCall()
+        case .sleep:
+            cancelDialog()
+            speak(orCanned: turn.say, .sleeping)
+            isSleeping = true
+        case .wake:
+            isSleeping = false
+            speak(orCanned: turn.say, .awake)
+        case .saveAs:
+            if case .confirmingNumber(let e164, let video) = dialog, !turn.name.isEmpty {
+                saveNumber(e164, as: turn.name, video: video)
+            } else {
+                speak(orCanned: turn.say, .askNumber)
+            }
+        case .repeatLast:
+            lastPrompt.isEmpty ? say(.nothingToRepeat) : speak(lastPrompt)
+        case .tellTime:
+            say(.currentTime(VoiceWorldInfo.spokenTime(language: language)))
+        case .tellDate:
+            say(.currentDate(VoiceWorldInfo.spokenDate(language: language)))
+        case .checkInternet:
+            say(VoiceWorldInfo.isOnline ? .internetAvailable : .internetUnavailable)
+        case .search:
+            startSearch(turn.name)
+        }
+        _ = addressed
+        _ = fallback
+    }
+
+    private func applyCall(name: String, video: Bool, groupsOnly: Bool, spoken: String) {
+        if name.isEmpty {
+            dialog = .awaitingName(video: video, groupsOnly: groupsOnly, attempts: 0)
+            speak(orCanned: spoken, .askWho(video: video))
+            return
+        }
+        if VoiceSpokenNumber.looksLikeNumber(name, languageCode: language) {
+            handleNumber(name, video: video, attempts: 0)
+            return
+        }
+        switch matchContact(name, groupsOnly: groupsOnly) {
+        case .one(let contact, let confident):
+            if confident {
+                startCountdown(contact, video: video, spoken: spoken)
+            } else {
+                dialog = .confirming(contact, video: video)
+                speak(orCanned: spoken, .didYouMean(contact.name))
+            }
+        case .several(let list):
+            dialog = .choosing(list, video: video)
+            speak(orCanned: spoken, list.count <= 4 ? .choices(list.map(\.name)) : .tooMany(list.count, name))
+        case .none(let suggestion):
+            if let suggestion {
+                dialog = .confirming(suggestion, video: video)
+                speak(orCanned: spoken, .didYouMean(suggestion.name))
+            } else {
+                dialog = .awaitingName(video: video, groupsOnly: groupsOnly, attempts: 1)
+                speak(orCanned: spoken, .notFound(name))
+            }
+        }
+    }
+
+    private func speak(orCanned spoken: String, _ prompt: VoicePrompt) {
+        if spoken.isEmpty { say(prompt) } else { speak(spoken) }
+    }
+
+    private func startSearch(_ query: String) {
+        let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !q.isEmpty else {
+            dialog = .awaitingSearch
+            say(.askSearch)
+            return
+        }
+        cancelDialog()
+        guard VoiceWorldInfo.isOnline else {
+            say(.internetUnavailable)
+            return
+        }
+        say(.searching)
+        assistantTask?.cancel()
+        assistantTask = Task { [weak self] in
+            guard let self else { return }
+            let result = await VoiceWorldInfo.search(q)
+            guard !Task.isCancelled else { return }
+            switch result {
+            case .success(let answer):
+                self.speak(answer)
+            case .failure(.offline):
+                self.say(.internetUnavailable)
+            case .failure(.failed):
+                self.say(.searchFailed)
+            case .failure(.noResult):
+                self.say(.searchNoResult)
+            }
+        }
     }
 
     /// Returns false when the reply wasn't about the open question, so it runs as a normal command.
@@ -498,7 +789,7 @@ final class VoiceCommandService: NSObject {
         case (.confirming(let contact, let video), .call(let name, _)) where name.isEmpty:
             dial(contact, video: video)
             say(contact.isGroup ? .groupCalling(contact.name) : .calling(contact.name, video: video))
-        case (.countdown, .call), (.countdown, .groupCall):
+        case (.countdown, .call), (.countdown, .groupCall), (.lookingUp, .call), (.lookingUp, .groupCall), (.lookingUp, .yes):
             break
         case (.confirmingNumber(let e164, let video), .call(let name, _)) where name.isEmpty:
             startCountdown(numberContact(e164), video: video)
@@ -511,12 +802,15 @@ final class VoiceCommandService: NSObject {
         case (_, .call), (_, .groupCall):
             cancelDialog()
             return false
-        case (_, .cancel), (.countdown, .no), (.countdown, .hangUp):
+        case (.countdown, .cancel), (.countdown, .no), (.countdown, .hangUp),
+             (.lookingUp, .cancel), (.lookingUp, .no), (.lookingUp, .hangUp):
+            abortOutgoingDial()
+        case (_, .cancel):
             cancelDialog()
             say(.canceled)
         case (.countdown(let contact, let video), .yes):
             dial(contact, video: video)
-        case (.countdown, _):
+        case (.countdown, _), (.lookingUp, _):
             break
         case (.confirming(let contact, let video), .yes):
             dial(contact, video: video)
@@ -562,6 +856,13 @@ final class VoiceCommandService: NSObject {
             say(.canceled)
         case (.awaitingCountry(let digits, let video), .text(let spoken)):
             applyCountry(spoken, digits: digits, video: video)
+        case (.awaitingSearch, .search(let query)) where !query.isEmpty:
+            startSearch(query)
+        case (.awaitingSearch, .text(let query)) where !query.isEmpty:
+            startSearch(query)
+        case (.awaitingSearch, .no):
+            cancelDialog()
+            say(.canceled)
         default:
             return false
         }
@@ -606,7 +907,7 @@ final class VoiceCommandService: NSObject {
         case .help: say(.help(inCall: currentCall != nil))
         case .repeatLast: lastPrompt.isEmpty ? say(.nothingToRepeat) : speak(lastPrompt)
         case .cancel:
-            if let call = currentCall, isOutgoingRinging(call) { hangUp() } else if addressed { say(.canceled) }
+            if currentCall != nil { hangUp() } else if addressed { say(.canceled) }
         case .sleep:
             cancelDialog()
             say(.sleeping)
@@ -627,6 +928,14 @@ final class VoiceCommandService: NSObject {
             }
         case .saveAs:
             say(.askNumber)
+        case .tellTime:
+            say(.currentTime(VoiceWorldInfo.spokenTime(language: language)))
+        case .tellDate:
+            say(.currentDate(VoiceWorldInfo.spokenDate(language: language)))
+        case .checkInternet:
+            say(VoiceWorldInfo.isOnline ? .internetAvailable : .internetUnavailable)
+        case .search(let query):
+            startSearch(query)
         case .yes, .no, .choose:
             if addressed { say(.didntCatch) }
         }
@@ -816,14 +1125,79 @@ final class VoiceCommandService: NSObject {
         contact.name.hasPrefix("+") ? VoiceSpokenNumber.spoken(contact.name, languageCode: language) : contact.name
     }
 
-    private func startCountdown(_ contact: VoiceContact, video: Bool) {
+    private func startCountdown(_ contact: VoiceContact, video: Bool, spoken: String? = nil) {
         if !contact.isGroup, let target = targets[contact.id], case .contact(let address) = target, address.isLocalAddress || isOwnNumber(address.phoneNumber ?? contact.name) {
             cancelDialog()
             say(.cantCallSelf)
             return
         }
+        if !contact.isGroup, let target = targets[contact.id], case .contact(let address) = target, address.serviceId == nil {
+            resolveRegisteredAddress(contact, video: video)
+            return
+        }
+        beginCountdown(contact, video: video, spoken: spoken)
+    }
+
+    /// CDS lookup so we never start a 1:1 call with only a phone number (no ACI/PNI).
+    private func resolveRegisteredAddress(_ contact: VoiceContact, video: Bool) {
+        guard case .contact(let address) = targets[contact.id], let e164 = address.phoneNumber ?? E164(contact.name)?.stringValue else {
+            cancelDialog()
+            say(.cantCall(spokenName(contact)))
+            return
+        }
+        if let known = registeredAddress(for: e164) {
+            if known.isLocalAddress {
+                cancelDialog()
+                say(.cantCallSelf)
+                return
+            }
+            targets[contact.id] = .contact(known)
+            beginCountdown(contact, video: video)
+            return
+        }
+        dialog = .lookingUp(contact, video: video)
+        say(.lookingUpNumber)
+        lookupTask?.cancel()
+        lookupTask = Task { [weak self] in
+            guard let self else { return }
+            do {
+                let recipients = try await SSKEnvironment.shared.contactDiscoveryManagerRef.lookUp(
+                    phoneNumbers: [e164],
+                    mode: .oneOffUserRequest,
+                )
+                guard !Task.isCancelled, case .lookingUp(let pending, let video) = self.dialog, pending == contact else { return }
+                guard let recipient = recipients.first, recipient.isRegistered, recipient.address.serviceId != nil else {
+                    self.dialog = .awaitingNumber(video: video, attempts: 1)
+                    self.say(.numberNotOnSignal)
+                    return
+                }
+                if recipient.address.isLocalAddress {
+                    self.cancelDialog()
+                    self.say(.cantCallSelf)
+                    return
+                }
+                self.targets[contact.id] = .contact(recipient.address)
+                self.beginCountdown(contact, video: video)
+            } catch {
+                guard !Task.isCancelled, case .lookingUp(let pending, let video) = self.dialog, pending == contact else { return }
+                self.dialog = .awaitingNumber(video: video, attempts: 1)
+                self.say(.numberLookupFailed)
+            }
+        }
+    }
+
+    private func registeredAddress(for e164: String) -> SignalServiceAddress? {
+        SSKEnvironment.shared.databaseStorageRef.read { tx in
+            let recipient = DependenciesBridge.shared.recipientDatabaseTable.fetchRecipient(phoneNumber: e164, transaction: tx)
+            guard let recipient, recipient.isRegistered, recipient.address.serviceId != nil else { return nil }
+            return recipient.address
+        }
+    }
+
+    private func beginCountdown(_ contact: VoiceContact, video: Bool, spoken: String? = nil) {
         dialog = .countdown(contact, video: video)
-        say(contact.isGroup ? .groupCalling(contact.name) : .calling(spokenName(contact), video: video)) { [weak self] in
+        let line = spoken?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let afterSpeak: () -> Void = { [weak self] in
             self?.countdown = Task { [weak self] in
                 // Time for "cancel" after the prompt, including the recognizer's finalization delay.
                 try? await Task.sleep(for: .seconds(2.5))
@@ -831,10 +1205,17 @@ final class VoiceCommandService: NSObject {
                 self.dial(pending, video: video)
             }
         }
+        if line.isEmpty {
+            say(contact.isGroup ? .groupCalling(contact.name) : .calling(spokenName(contact), video: video), then: afterSpeak)
+        } else {
+            speak(line, then: afterSpeak)
+        }
     }
 
     private func cancelDialog() {
         countdown?.cancel()
+        lookupTask?.cancel()
+        assistantTask?.cancel()
         dialogTimeout?.cancel()
         dialog = .none
     }
@@ -857,6 +1238,10 @@ final class VoiceCommandService: NSObject {
             case .contact(let address):
                 if address.isLocalAddress || isOwnNumber(address.phoneNumber ?? "") {
                     say(.cantCallSelf)
+                    return
+                }
+                guard address.serviceId != nil else {
+                    say(.numberNotOnSignal)
                     return
                 }
                 let thread = TSContactThread.getOrCreateThread(contactAddress: address)
@@ -983,14 +1368,29 @@ final class VoiceCommandService: NSObject {
         callService.callUIAdapter.localHangupCall(call)
     }
 
+    private func abortOutgoingDial() {
+        cancelDialog()
+        say(.cancellingCall, immediately: true)
+    }
+
     private func hangUp() {
         if case .countdown = dialog {
-            cancelDialog()
-            return say(.canceled)
+            abortOutgoingDial()
+            return
         }
-        guard let call = currentCall else { return say(.noCall) }
-        _ = releaseCallAudio()
-        callService.callUIAdapter.localHangupCall(call)
+        if case .lookingUp = dialog {
+            abortOutgoingDial()
+            return
+        }
+        guard currentCall != nil else { return say(.noCall) }
+        suppressCallEnded = true
+        say(.cancellingCall, immediately: true) { [weak self] in
+            guard let self else { return }
+            _ = self.releaseCallAudio()
+            if let call = self.currentCall {
+                self.callService.callUIAdapter.localHangupCall(call)
+            }
+        }
     }
 
     private func setMuted(_ muted: Bool, call: SignalCall) {
@@ -1067,11 +1467,11 @@ final class VoiceCommandService: NSObject {
 
     // MARK: - Speaking
 
-    private func say(_ prompt: VoicePrompt, then completion: (() -> Void)? = nil) {
-        speak(prompt.text(language), then: completion)
+    private func say(_ prompt: VoicePrompt, immediately: Bool = false, then completion: (() -> Void)? = nil) {
+        speak(prompt.text(language), immediately: immediately, then: completion)
     }
 
-    private func speak(_ text: String, then completion: (() -> Void)? = nil) {
+    private func speak(_ text: String, immediately: Bool = false, then completion: (() -> Void)? = nil) {
         if synthesizer.isSpeaking { synthesizer.stopSpeaking(at: .immediate) }
         Logger.info("Voice commands say: \(text)")
         lastPrompt = text
@@ -1081,7 +1481,7 @@ final class VoiceCommandService: NSObject {
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = OnDeviceTTS.bestVoice(for: language, allowPersonalVoice: false)
         utterance.prefersAssistiveTechnologySettings = true
-        utterance.preUtteranceDelay = 0.45
+        utterance.preUtteranceDelay = immediately ? 0 : 0.45
         speakingSince = Date()
         afterSpeaking = completion
         synthesizer.speak(utterance)
@@ -1095,7 +1495,7 @@ final class VoiceCommandService: NSObject {
         afterSpeaking = nil
         completion?()
         switch dialog {
-        case .awaitingName, .choosing, .confirming, .awaitingNumber, .confirmingNumber, .awaitingCountry:
+        case .awaitingName, .choosing, .confirming, .awaitingNumber, .confirmingNumber, .awaitingCountry, .awaitingSearch:
             AudioServicesPlaySystemSound(1113)
             dialogTimeout?.cancel()
             dialogTimeout = Task { [weak self] in
@@ -1104,7 +1504,7 @@ final class VoiceCommandService: NSObject {
                 self.cancelDialog()
                 self.say(.timeout)
             }
-        case .none, .countdown:
+        case .none, .countdown, .lookingUp:
             break
         }
     }
@@ -1140,7 +1540,11 @@ extension VoiceCommandService: CallServiceStateObserver {
         } else if oldValue != nil, isEnabled {
             announcedCall = nil
             groupHoldRestore = nil
-            say(.callEnded)
+            if suppressCallEnded {
+                suppressCallEnded = false
+            } else {
+                say(.callEnded)
+            }
         }
         refresh()
     }

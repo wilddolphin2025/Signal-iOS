@@ -11,11 +11,20 @@
 		<string>LazyDatabaseMigratorTask</string>
 	</array>
 	<key>BuildDetails</key>
-	<dict/>
+	<dict>
+		<key>DateTime</key>
+		<string>Thu Oct  8 23:32:28 UTC 2026</string>
+		<key>SignalCommit</key>
+		<string>ea714ea4271a3edbe748fd06ddc373d094331b2c feat: add on-device speech and hands-free voice commands</string>
+		<key>Timestamp</key>
+		<integer>1791502348</integer>
+		<key>XCodeVersion</key>
+		<string>2700.2700</string>
+	</dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>${PRODUCT_NAME}</string>
+	<string>Signal+AI</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleGetInfoString</key>
@@ -27,7 +36,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>${PRODUCT_NAME}</string>
+	<string>Signal+AI</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -48,7 +57,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>0</string>
+	<string>202610082</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LOGS_EMAIL</key>
@@ -77,29 +86,29 @@
 		</dict>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>Signal needs to use Apple Music to play media attachments.</string>
+	<string>Signal+AI needs to use Apple Music to play media attachments.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_sgnl-new-device._tcp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Signal uses your camera to take photos, start or join a video call and to scan QR codes.</string>
+	<string>Signal+AI uses your camera to take photos, start or join a video call and to scan QR codes.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Signal uses your contacts to find users you know. We do not store your contacts on the server.</string>
+	<string>Signal+AI uses your contacts to find users you know. We do not store your contacts on the server.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Signal uses Face ID to confirm it's you.</string>
+	<string>Signal+AI uses Face ID to confirm it's you.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Signal uses the local network to allow you to directly transfer your account to a new phone. It will not be used unless you explicitly choose to initiate a transfer to a new device.</string>
+	<string>Signal+AI uses the local network to allow you to directly transfer your account to a new phone. It will not be used unless you explicitly choose to initiate a transfer to a new device.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Signal needs access to your location in order to share your current location.</string>
+	<string>Signal+AI needs access to your location in order to share your current location.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Signal needs access to your microphone to make and receive phone calls and record voice messages.</string>
+	<string>Signal+AI needs access to your microphone to make and receive phone calls and record voice messages.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Signal will save photos to your library.</string>
+	<string>Signal+AI will save photos to your library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Signal will let you choose which photos from your library to send.</string>
+	<string>Signal+AI will let you choose which photos from your library to send.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Signal transcribes dictation and voice messages on this iPhone. Audio never leaves your device.</string>
+	<string>Signal+AI transcribes dictation and voice messages on this iPhone. Audio never leaves your device.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>INSendMessageIntent</string>

@@ -25,6 +25,7 @@ enum VoicePrompt {
     case choices([String])
     case tooMany(Int, String)
     case canceled
+    case cancellingCall
     case incoming(String, video: Bool)
     case noIncoming
     case noCall
@@ -45,6 +46,9 @@ enum VoicePrompt {
     case blocked(String)
     case cantCall(String)
     case cantCallSelf
+    case lookingUpNumber
+    case numberNotOnSignal
+    case numberLookupFailed
     case sleeping
     case awake
     case help(inCall: Bool)
@@ -56,6 +60,14 @@ enum VoicePrompt {
     case askCountry
     case numberInvalid
     case numberSaved(String, String)
+    case currentTime(String)
+    case currentDate(String)
+    case internetAvailable
+    case internetUnavailable
+    case askSearch
+    case searching
+    case searchFailed
+    case searchNoResult
 
     enum StatusDetail { case muted, onHold, speaker, camera, ringing }
 
@@ -88,6 +100,7 @@ enum VoicePrompt {
         case .choices(let names): "I found \(names.count): \(Self.numbered(names, "en")). Which one?"
         case .tooMany(let count, let name): "I found \(count) matches for \(name). Say the full name."
         case .canceled: "Canceled."
+        case .cancellingCall: "Cancelling call."
         case .incoming(let name, let video): "Incoming \(video ? "video " : "")call from \(name). Say answer or decline."
         case .noIncoming: "There's no incoming call."
         case .noCall: "You're not on a call."
@@ -108,9 +121,12 @@ enum VoicePrompt {
         case .blocked(let name): "\(name) is blocked. Unblock them in Signal first."
         case .cantCall(let name): "I can't call \(name)."
         case .cantCallSelf: "That's your own number. Say a different number, or a contact name."
+        case .lookingUpNumber: "Checking if that number is on Signal."
+        case .numberNotOnSignal: "That number isn't on Signal. Say another number, or a contact name."
+        case .numberLookupFailed: "I couldn't check that number. Check your connection and say the number again."
         case .sleeping: "Okay, I'll stop listening. Say Hey Signal, wake up, when you need me."
         case .awake: "I'm listening."
-        case .help(inCall: false): "You can say: call and a name; call plus 1 and the number; video call and a name; call back; missed calls; or stop listening."
+        case .help(inCall: false): "You can say: call and a name; what time is it; what date; is the internet available; search for something; or stop listening."
         case .help(inCall: true): "Start with Signal, then say: mute, unmute, hold, resume, speaker on or off, camera on or off, switch camera, status, or hang up."
         case .didntCatch: "Sorry, I didn't catch that. Say help to hear what you can say."
         case .timeout: "I'll stop here. Say call and a name when you're ready."
@@ -120,6 +136,14 @@ enum VoicePrompt {
         case .askCountry: "Which country is that number in? For example, United States, Canada, or Russia."
         case .numberInvalid: "That doesn't look like a working number. Say it again, digit by digit, starting with plus."
         case .numberSaved(let name, let spoken): "Saved \(name) as \(spoken)."
+        case .currentTime(let time): "It's \(time)."
+        case .currentDate(let date): "Today is \(date)."
+        case .internetAvailable: "Yes, the internet is available. You can say search for, then what you want."
+        case .internetUnavailable: "No internet right now. I can still tell the time, or place a call."
+        case .askSearch: "What should I search for?"
+        case .searching: "Looking that up."
+        case .searchFailed: "I couldn't reach the internet. Try again when you're online."
+        case .searchNoResult: "I couldn't find a short answer for that. Try a simpler search."
         }
     }
 
@@ -154,6 +178,7 @@ enum VoicePrompt {
         case .choices(let names): "Encontré \(names.count): \(Self.numbered(names, "es")). ¿Cuál?"
         case .tooMany(let count, let name): "Hay \(count) coincidencias para \(name). Di el nombre completo."
         case .canceled: "Cancelado."
+        case .cancellingCall: "Cancelando la llamada."
         case .incoming(let name, let video): "\(video ? "Videollamada" : "Llamada") entrante de \(name). Di contesta o rechaza."
         case .noIncoming: "No hay ninguna llamada entrante."
         case .noCall: "No estás en una llamada."
@@ -174,9 +199,12 @@ enum VoicePrompt {
         case .blocked(let name): "\(name) está bloqueado. Desbloquéalo primero en Signal."
         case .cantCall(let name): "No puedo llamar a \(name)."
         case .cantCallSelf: "Ese es tu propio número. Di otro número o un nombre."
+        case .lookingUpNumber: "Comprobando si ese número está en Signal."
+        case .numberNotOnSignal: "Ese número no está en Signal. Di otro número o un nombre."
+        case .numberLookupFailed: "No pude comprobar ese número. Revisa la conexión y dilo otra vez."
         case .sleeping: "De acuerdo, dejo de escuchar. Di Oye Signal, despierta, cuando me necesites."
         case .awake: "Te escucho."
-        case .help(inCall: false): "Puedes decir: llama y un nombre; videollamada y un nombre; devuelve la llamada; llamadas perdidas; o deja de escuchar."
+        case .help(inCall: false): "Puedes decir: llama y un nombre; qué hora es; qué fecha es; hay internet; busca y lo que quieras; o deja de escuchar."
         case .help(inCall: true): "Empieza con Signal y di: silencia, activa el micrófono, espera, reanuda, altavoz, cámara, cambia la cámara, estado o cuelga."
         case .didntCatch: "Perdona, no te entendí. Di ayuda para saber qué puedes decir."
         case .timeout: "Lo dejo aquí. Di llama y un nombre cuando quieras."
@@ -186,6 +214,14 @@ enum VoicePrompt {
         case .askCountry: "¿De qué país es ese número? Por ejemplo, Estados Unidos, Canadá o Rusia."
         case .numberInvalid: "Ese número no parece válido. Dilo otra vez, dígito a dígito, empezando por más."
         case .numberSaved(let name, let spoken): "Guardé \(name) como \(spoken)."
+        case .currentTime(let time): "Son las \(time)."
+        case .currentDate(let date): "Hoy es \(date)."
+        case .internetAvailable: "Sí, hay internet. Di busca y lo que quieras."
+        case .internetUnavailable: "No hay internet ahora. Puedo decirte la hora o hacer una llamada."
+        case .askSearch: "¿Qué busco?"
+        case .searching: "Lo busco."
+        case .searchFailed: "No pude conectar. Inténtalo cuando haya internet."
+        case .searchNoResult: "No encontré una respuesta corta. Prueba una búsqueda más simple."
         }
     }
 
@@ -220,6 +256,7 @@ enum VoicePrompt {
         case .choices(let names): "Найдено вариантов: \(names.count). \(Self.numbered(names, "ru")). Какой?"
         case .tooMany(let count, let name): "Совпадений для \(name): \(count). Назовите полное имя."
         case .canceled: "Отменено."
+        case .cancellingCall: "Отменяю звонок."
         case .incoming(let name, let video): "\(video ? "Входящий видеозвонок" : "Входящий звонок") от \(name). Скажите ответь или отклони."
         case .noIncoming: "Входящего звонка нет."
         case .noCall: "Сейчас нет звонка."
@@ -240,9 +277,12 @@ enum VoicePrompt {
         case .blocked(let name): "\(name): контакт заблокирован. Сначала разблокируйте его в Signal."
         case .cantCall(let name): "Невозможно позвонить: \(name)."
         case .cantCallSelf: "Это ваш собственный номер. Назовите другой номер или имя."
+        case .lookingUpNumber: "Проверяю, есть ли этот номер в Signal."
+        case .numberNotOnSignal: "Этого номера нет в Signal. Назовите другой номер или имя."
+        case .numberLookupFailed: "Не удалось проверить номер. Проверьте связь и повторите номер."
         case .sleeping: "Хорошо, больше не слушаю. Скажите Эй Сигнал, проснись, когда понадоблюсь."
         case .awake: "Слушаю."
-        case .help(inCall: false): "Можно сказать: позвони и имя; видеозвонок и имя; перезвони; пропущенные; или перестань слушать."
+        case .help(inCall: false): "Можно сказать: позвони и имя; который час; какая дата; есть интернет; найди и запрос; или перестань слушать."
         case .help(inCall: true): "Скажите Сигнал и команду: выключи микрофон, включи микрофон, удержание, продолжи, громкая связь, камера, переключи камеру, статус или заверши."
         case .didntCatch: "Не удалось разобрать. Скажите помощь, чтобы узнать команды."
         case .timeout: "Пока остановлюсь. Скажите позвони и имя, когда будете готовы."
@@ -252,6 +292,14 @@ enum VoicePrompt {
         case .askCountry: "Какая страна у этого номера? Например, США, Канада или Россия."
         case .numberInvalid: "Похоже, номер неверный. Повторите по цифрам, начиная с плюс."
         case .numberSaved(let name, let spoken): "Сохранено: \(name), \(spoken)."
+        case .currentTime(let time): "Сейчас \(time)."
+        case .currentDate(let date): "Сегодня \(date)."
+        case .internetAvailable: "Интернет есть. Скажите найди и что искать."
+        case .internetUnavailable: "Интернета нет. Могу сказать время или позвонить."
+        case .askSearch: "Что найти?"
+        case .searching: "Ищу."
+        case .searchFailed: "Нет связи. Повторите, когда появится интернет."
+        case .searchNoResult: "Короткого ответа нет. Сформулируйте запрос проще."
         }
     }
 

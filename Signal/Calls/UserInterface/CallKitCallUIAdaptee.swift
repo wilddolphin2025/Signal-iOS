@@ -567,7 +567,7 @@ final class CallKitCallUIAdaptee: NSObject, CallUIAdaptee, @preconcurrency CXPro
         _ = SUIEnvironment.shared.audioSessionRef.startAudioActivity(self.audioActivity)
 
         guard let call = self.callService.callServiceState.currentCall else {
-            owsFailDebug("No current call for AudioSession")
+            Logger.warn("CallKit: didActivate with no current call; ignoring")
             return
         }
 

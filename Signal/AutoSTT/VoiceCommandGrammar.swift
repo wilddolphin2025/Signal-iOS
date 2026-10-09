@@ -34,6 +34,10 @@ enum VoiceIntent: Equatable {
     /// "Can you hear me?": people check that the phone is listening before giving a command.
     case presenceCheck
     case saveAs(String)
+    case tellTime
+    case tellDate
+    case checkInternet
+    case search(String)
     /// Anything else: a contact name or refinement while a dialog is open.
     case text(String)
 }
@@ -78,6 +82,10 @@ enum VoiceCommandParser {
         for phrase in lexicon.saveAs {
             var rest = tokens
             if stripPrefix(phrase, from: &rest), !rest.isEmpty { return .saveAs(rest.joined(separator: " ")) }
+        }
+        for phrase in lexicon.searchPrefixes {
+            var rest = tokens
+            if stripPrefix(phrase, from: &rest) { return .search(rest.joined(separator: " ")) }
         }
 
         for (verbs, kind) in [(lexicon.groupCallVerbs, 2), (lexicon.videoCallVerbs, 1), (lexicon.callVerbs, 0)] {
@@ -182,6 +190,7 @@ struct VoiceLexicon {
     /// Checked before call verbs so "call back" or "missed calls" isn't read as calling someone.
     var priorityPhrases: [(String, VoiceIntent)]
     var saveAs: [String]
+    var searchPrefixes: [String]
     var callVerbs: [String]
     var videoCallVerbs: [String]
     var groupCallVerbs: [String]
@@ -223,6 +232,7 @@ struct VoiceLexicon {
         copy.exact = pairs(exact)
         copy.priorityPhrases = pairs(priorityPhrases)
         copy.saveAs = list(saveAs)
+        copy.searchPrefixes = list(searchPrefixes)
         copy.callVerbs = list(callVerbs)
         copy.videoCallVerbs = list(videoCallVerbs)
         copy.groupCallVerbs = list(groupCallVerbs)
@@ -267,8 +277,12 @@ struct VoiceLexicon {
             + each(["wake up", "start listening", "i need you"], .wake)
             + each(["repeat what you just said", "repeat what you said", "repeat what you just told me", "repeat that",
                     "say what you just said", "say it again", "say that one more time", "what did you just say",
-                    "could you repeat that", "can you repeat that", "would you repeat that"], .repeatLast),
+                    "could you repeat that", "can you repeat that", "would you repeat that"], .repeatLast)
+            + each(["what time is it", "what's the time", "what time is it now", "what's the time now", "tell me the time", "the time"], .tellTime)
+            + each(["what date", "what's the date", "what date is it", "what's today's date", "what day is it", "what's today", "what day is it today", "tell me the date"], .tellDate)
+            + each(["is the internet available", "is internet available", "am i online", "do i have internet", "is there internet", "are we online", "do we have internet"], .checkInternet),
         saveAs: ["save as", "save it as", "save that as", "add as", "add it as", "name it", "call it"],
+        searchPrefixes: ["search for", "search", "look up", "look it up", "look up for", "google", "find out", "quick search for", "quick search"],
         callVerbs: ["call", "dial", "phone", "ring", "call up", "get me", "connect me to", "connect me with", "voice call", "audio call", "make a call to", "place a call to", "start a call with", "talk to", "speak to"],
         videoCallVerbs: ["video call", "videocall", "facetime", "face time", "video chat with", "video chat", "start a video call with", "make a video call to"],
         groupCallVerbs: ["group call", "call the group", "call group", "start a group call with", "start a group call", "join the group call with"],
@@ -283,7 +297,10 @@ struct VoiceLexicon {
             + each(["mute me", "mute the call", "mute", "silence"], .mute(true))
             + each(["switch camera", "flip camera", "switch the camera", "flip the camera", "rear camera", "back camera", "front camera", "selfie camera", "other camera", "turn the camera around"], .flipCamera)
             + each(["help", "what can i say", "what can you do", "commands", "options"], .help)
-            + each(["repeat", "say again", "say that again", "come again", "pardon", "what did you say", "one more time"], .repeatLast),
+            + each(["repeat", "say again", "say that again", "come again", "pardon", "what did you say", "one more time"], .repeatLast)
+            + each(["what time", "the time"], .tellTime)
+            + each(["what date", "the date", "what day"], .tellDate)
+            + each(["internet", "online"], .checkInternet),
         speakerWords: ["speaker", "speakerphone", "speaker phone", "loudspeaker", "loud speaker", "hands free"],
         earpieceWords: ["earpiece", "handset", "phone mode", "private mode"],
         cameraWords: ["camera", "video"],
@@ -321,8 +338,12 @@ struct VoiceLexicon {
             + each(["deja de escuchar", "duérme*"], .sleep)
             + each(["despierta*", "empieza a escuchar"], .wake)
             + each(["repite lo que acabas de decir", "repite lo que dijiste", "repite eso", "vuelve a decirlo",
-                    "qué acabas de decir", "puedes repetir", "repítelo"], .repeatLast),
+                    "qué acabas de decir", "puedes repetir", "repítelo"], .repeatLast)
+            + each(["qué hora es", "qué hora es ahora", "dime la hora"], .tellTime)
+            + each(["qué fecha es", "qué día es", "qué día es hoy", "cuál es la fecha", "dime la fecha"], .tellDate)
+            + each(["hay internet", "hay conexión", "estoy en línea", "tenemos internet"], .checkInternet),
         saveAs: ["guarda como", "guardar como", "guárdalo como", "añade como", "nómbralo"],
+        searchPrefixes: ["busca", "buscar", "busca esto", "busca eso", "busca información de", "googlea"],
         callVerbs: ["llama*", "marca*", "telefonea*", "contacta*", "comunícame con", "ponme con", "haz una llamada a", "llamada a", "llamada con", "habla con"],
         videoCallVerbs: ["videollama*", "video llamada*", "llamada de video", "llamada por video", "haz una videollamada a", "haz una videollamada con"],
         groupCallVerbs: ["llamada grupal", "llamada grupal con", "llama al grupo", "llamada de grupo", "llamada al grupo"],
@@ -337,7 +358,10 @@ struct VoiceLexicon {
             + each(["silencia*", "mutea*"], .mute(true))
             + each(["cambia* la cámara", "cambiar cámara", "gira* la cámara", "cámara trasera", "cámara frontal", "otra cámara"], .flipCamera)
             + each(["ayuda", "qué puedo decir", "qué puedes hacer", "comandos", "opciones"], .help)
-            + each(["repite*", "otra vez", "qué dijiste", "cómo dijiste", "perdón", "una vez más"], .repeatLast),
+            + each(["repite*", "otra vez", "qué dijiste", "cómo dijiste", "perdón", "una vez más"], .repeatLast)
+            + each(["qué hora", "la hora"], .tellTime)
+            + each(["qué fecha", "qué día", "la fecha"], .tellDate)
+            + each(["internet", "conexión", "en línea"], .checkInternet),
         speakerWords: ["altavoz", "manos libres", "parlante", "bocina"],
         earpieceWords: ["auricular", "modo privado"],
         cameraWords: ["cámara", "video"],
@@ -375,8 +399,12 @@ struct VoiceLexicon {
             + each(["проснись", "начни слушать"], .wake)
             + each(["повтори что ты только что сказал", "повтори что ты только что сказала", "повтори что ты сказал",
                     "повтори что ты сказала", "повтори что только что сказал", "что ты только что сказал",
-                    "что ты только что сказала", "повтори это"], .repeatLast),
+                    "что ты только что сказала", "повтори это"], .repeatLast)
+            + each(["который час", "сколько времени", "какое сейчас время"], .tellTime)
+            + each(["какое сегодня число", "какая сегодня дата", "какой сегодня день", "какое число"], .tellDate)
+            + each(["есть интернет", "есть сеть", "я в сети", "есть связь"], .checkInternet),
         saveAs: ["сохрани как", "сохранить как", "назови", "добавь как"],
+        searchPrefixes: ["найди", "найти", "поищи", "поиск", "загугли"],
         callVerbs: ["позвон*", "набер*", "набрать", "вызов*", "звони*", "соедини* с", "соедини*", "свяжи* с", "свяжи*", "звонок"],
         videoCallVerbs: ["видеозвон*", "видео звонок", "видеовызов*"],
         groupCallVerbs: ["групповой звонок", "позвон* в группу", "звонок в группу"],
@@ -390,7 +418,10 @@ struct VoiceLexicon {
             + each(["без звука", "заглуши*"], .mute(true))
             + each(["переключи* камеру", "смени* камеру", "задн* камер*", "фронтальн* камер*", "другую камеру", "разверни* камеру"], .flipCamera)
             + each(["помощь", "помоги*", "что можно сказать", "что ты умеешь", "команды"], .help)
-            + each(["повтори", "повтори еще раз", "еще раз", "что ты сказал", "что ты сказала", "не понял", "не поняла"], .repeatLast),
+            + each(["повтори", "повтори еще раз", "еще раз", "что ты сказал", "что ты сказала", "не понял", "не поняла"], .repeatLast)
+            + each(["который час", "сколько времени"], .tellTime)
+            + each(["какое число", "какая дата", "какой день"], .tellDate)
+            + each(["интернет", "в сети"], .checkInternet),
         speakerWords: ["громк* связ*", "громкую", "громкая", "динамик*", "спикер"],
         earpieceWords: ["через трубку", "в трубку", "разговорн* динамик*"],
         cameraWords: ["камер*", "видео"],
