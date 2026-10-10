@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Signal Gateway · rtc.wilddolphin.us</title>
+  <style>
+    :root { color-scheme: dark; --bg: #0f1419; --card: #1c232b; --text: #e8eef4; --muted: #93a4b5; --accent: #3c8cff; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    main { max-width: 720px; margin: 0 auto; padding: 32px 20px 64px; }
+    h1 { font-size: 1.6rem; margin: 0 0 8px; }
+    p.lead { color: var(--muted); margin: 0 0 28px; }
+    .card { background: var(--card); border-radius: 16px; padding: 18px 20px; margin: 0 0 12px; display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .card h2 { margin: 0 0 4px; font-size: 1.1rem; }
+    .meta { color: var(--muted); font-variant-numeric: tabular-nums; }
+    a.dial { background: var(--accent); color: white; text-decoration: none; padding: 10px 16px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Signal test contacts</h1>
+    <p class="lead">Dial these from Signal messenger. Each number maps to a standard RTC function on rtc.wilddolphin.us.</p>
+    <div id="list">Loading contacts…</div>
+  </main>
+  <script>
+    fetch('/contacts').then(r => r.json()).then(data => {
+      const root = document.getElementById('list');
+      root.innerHTML = '';
+      (data.contacts || []).forEach(c => {
+        const el = document.createElement('article');
+        el.className = 'card';
+        el.innerHTML = `<div>
+            <h2>${c.display_name}</h2>
+            <div class="meta">${c.e164} · ext ${c.short_number} · ${c.id}</div>
+            <p>${c.summary}</p>
+          </div>
+          <a class="dial" href="/call/${c.id}?video=${c.wants_video ? '1' : '0'}">Call</a>`;
+        root.appendChild(el);
+      });
+    }).catch(() => {
+      document.getElementById('list').textContent = 'Could not load contacts.';
+    });
+  </script>
+</body>
+</html>

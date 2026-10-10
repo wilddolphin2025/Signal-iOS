@@ -195,6 +195,11 @@ public class FindByPhoneNumberViewController: OWSTableViewController2 {
         guard let nationalNumber = nationalNumberTextField.text else {
             return nil
         }
+        if let contact = SignalGatewayContacts.contact(matchingNumber: nationalNumber)
+            ?? SignalGatewayContacts.contact(matchingNumber: country.plusPrefixedCallingCode + nationalNumber)
+        {
+            return contact.e164
+        }
         let phoneNumberUtil = SSKEnvironment.shared.phoneNumberUtilRef
         return phoneNumberUtil.parsePhoneNumber(
             countryCode: country.countryCode,
@@ -228,15 +233,19 @@ public class FindByPhoneNumberViewController: OWSTableViewController2 {
                     do {
                         let recipients = try await SSKEnvironment.shared.contactDiscoveryManagerRef.lookUp(phoneNumbers: [phoneNumber], mode: .oneOffUserRequest)
                         modal.dismissIfNotCanceled {
-                            guard let recipient = recipients.first else {
-                                RecipientPickerViewController.presentSMSInvitationSheet(
-                                    for: phoneNumber,
-                                    fromViewController: self,
-                                    dismissalDelegate: self,
-                                )
+                            if let recipient = recipients.first {
+                                self.findByPhoneNumberDelegate?.findByPhoneNumber(self, didSelectAddress: recipient.address)
                                 return
                             }
-                            self.findByPhoneNumberDelegate?.findByPhoneNumber(self, didSelectAddress: recipient.address)
+                            if let contact = SignalGatewayContacts.contact(matchingNumber: phoneNumber) {
+                                self.findByPhoneNumberDelegate?.findByPhoneNumber(self, didSelectAddress: contact.address)
+                                return
+                            }
+                            RecipientPickerViewController.presentSMSInvitationSheet(
+                                for: phoneNumber,
+                                fromViewController: self,
+                                dismissalDelegate: self,
+                            )
                         }
                     } catch {
                         modal.dismissIfNotCanceled {

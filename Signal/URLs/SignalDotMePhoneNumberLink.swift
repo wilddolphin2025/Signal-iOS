@@ -34,14 +34,18 @@ class SignalDotMePhoneNumberLink {
                 do {
                     let signalRecipients = try await SSKEnvironment.shared.contactDiscoveryManagerRef.lookUp(phoneNumbers: [phoneNumber], mode: .oneOffUserRequest)
                     modal.dismissIfNotCanceled {
-                        guard let recipient = signalRecipients.first else {
-                            RecipientPickerViewController.presentSMSInvitationSheet(
-                                for: phoneNumber,
-                                fromViewController: fromViewController,
-                            )
+                        if let recipient = signalRecipients.first {
+                            block(recipient.address)
                             return
                         }
-                        block(recipient.address)
+                        if let contact = SignalGatewayContacts.contact(matchingNumber: phoneNumber) {
+                            block(contact.address)
+                            return
+                        }
+                        RecipientPickerViewController.presentSMSInvitationSheet(
+                            for: phoneNumber,
+                            fromViewController: fromViewController,
+                        )
                     }
                 } catch {
                     modal.dismissIfNotCanceled {

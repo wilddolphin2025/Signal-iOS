@@ -48,6 +48,13 @@ public class AccountChecker {
     /// If it exists, the `SignalRecipient` is marked as "registered". If it
     /// doesn't exist, the `SignalRecipient` is marked as "unregistered".
     func checkIfAccountExists(serviceId: ServiceId) async throws -> Bool {
+        if SignalGatewayContacts.isGatewayServiceId(serviceId) {
+            await db.awaitableWrite { tx in
+                _ = SignalGatewayRegistrar.registerAll(tx: tx)
+            }
+            return true
+        }
+
         var exists = true
         do {
             try await chatConnectionManager.withUnauthService(.profiles) {
@@ -75,6 +82,10 @@ public class AccountChecker {
         tx: DBWriteTransaction,
     ) {
         AssertNotOnMainThread()
+
+        if SignalGatewayContacts.isGatewayServiceId(serviceId) {
+            return
+        }
 
         guard var recipient = recipientStore.fetchRecipient(serviceId: serviceId, transaction: tx) else {
             return

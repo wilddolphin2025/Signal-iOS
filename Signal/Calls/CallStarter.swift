@@ -130,6 +130,28 @@ struct CallStarter {
             self.whitelistThread(thread)
         }
 
+        if case .contactThread(let thread, let withVideo) = recipient,
+           let gatewayContact = SignalGatewayContacts.contact(matching: thread.contactAddress) {
+            Task { @MainActor in
+                do {
+                    _ = try await CallStarter.prepareToStartCall(
+                        from: viewController,
+                        shouldAskForCameraPermission: withVideo || gatewayContact.wantsVideo,
+                    )
+                    let callView = GatewayCallViewController(
+                        contact: gatewayContact,
+                        withVideo: withVideo || gatewayContact.wantsVideo,
+                    )
+                    viewController.present(callView, animated: true)
+                } catch let prepareError as CallStarter.PrepareToStartCallError {
+                    CallStarter.showPrepareToStartCallError(prepareError, from: viewController)
+                } catch {
+                    owsFailDebug("Failed to start gateway call: \(error)")
+                }
+            }
+            return .callStarted
+        }
+
         context.callService.initiateCall(to: callTarget, isVideo: isVideoCall)
         return .callStarted
     }

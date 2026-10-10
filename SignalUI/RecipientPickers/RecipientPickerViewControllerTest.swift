@@ -44,6 +44,12 @@ final class RecipientPickerViewControllerTests: XCTestCase {
             TestCase(searchText: "+1 (23", searchResults: ["+123"]),
             TestCase(searchText: "+1 (234) 555-0100", searchResults: ["+12345550100"]),
 
+            // RTC test contacts are registered in this client, including reserved 555 numbers.
+            TestCase(searchText: "+15551111001", searchResults: ["+15551111001"]),
+            TestCase(searchText: "+1 555-111-1001", searchResults: ["+15551111001"]),
+            TestCase(searchText: "5551111001", searchResults: ["+15551111001"]),
+            TestCase(searchText: "1001", searchResults: ["+15551111001"]),
+
             // test too many digits
             TestCase(searchText: "+ 12345 12345 12345 1234", searchResults: ["+1234512345123451234"]),
             TestCase(searchText: "+ 12345 12345 12345 12345", searchResults: []),
@@ -65,6 +71,8 @@ final class RecipientPickerViewControllerTests: XCTestCase {
             TestCase(searchResult: .valid(validE164: "+16505550101"), isValid: true, isFound: false),
             TestCase(searchResult: .maybeValid(maybeValidE164: "+16505550102"), isValid: true, isFound: true),
             TestCase(searchResult: .maybeValid(maybeValidE164: "+1650"), isValid: false, isFound: false),
+            TestCase(searchResult: .maybeValid(maybeValidE164: "+1 555-111-1001"), isValid: true, isFound: true),
+            TestCase(searchResult: .valid(validE164: "+15551111001"), isValid: true, isFound: true),
         ]
         for testCase in testCases {
             let context = "searchResult: \(testCase.searchResult)"

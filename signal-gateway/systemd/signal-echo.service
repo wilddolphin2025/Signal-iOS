@@ -1,0 +1,19 @@
+[Unit]
+Description=Accept Signal calls and echo audio and video
+After=signal-cli.service signal-pulse.service
+Requires=signal-cli.service signal-pulse.service
+
+[Service]
+User=signal-gateway
+Group=signal-gateway
+Environment=XDG_RUNTIME_DIR=/run/signal-gateway
+Environment=HOME=/var/lib/signal-cli
+EnvironmentFile=-/etc/signal-gateway.env
+Environment=SIGNAL_CLI_TCP_HOST=127.0.0.1
+Environment=SIGNAL_CLI_TCP_PORT=7584
+ExecStart=/usr/bin/python3 /opt/signal-gateway/echo_call.py
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

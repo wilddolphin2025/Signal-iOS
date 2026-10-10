@@ -1,0 +1,16 @@
+[Unit]
+Description=PulseAudio for Signal echo calls
+After=network.target
+
+[Service]
+User=signal-gateway
+Group=signal-gateway
+RuntimeDirectory=signal-gateway
+Environment=XDG_RUNTIME_DIR=/run/signal-gateway
+Environment=HOME=/var/lib/signal-cli
+ExecStart=/usr/bin/pulseaudio --daemonize=no --exit-idle-time=-1 --disallow-exit
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

@@ -100,6 +100,9 @@ public class ProfileFetcherJob {
             )
             return fetchedProfile
         } catch ProfileRequestError.notFound {
+            if SignalGatewayContacts.isGatewayServiceId(serviceId) {
+                throw ProfileRequestError.notFound
+            }
             let isRegistered = db.read { tx in
                 return recipientDatabaseTable.fetchRecipient(serviceId: serviceId, transaction: tx)?.isRegistered == true
             }
@@ -111,6 +114,9 @@ public class ProfileFetcherJob {
     }
 
     private func requestProfile(localIdentifiers: LocalIdentifiers) async throws -> FetchedProfile {
+        if SignalGatewayContacts.isGatewayServiceId(serviceId) {
+            throw ProfileRequestError.notFound
+        }
         do {
             return try await Retry.performWithBackoff(maxAttempts: 3) {
                 return try await requestProfileAttempt(localIdentifiers: localIdentifiers)
