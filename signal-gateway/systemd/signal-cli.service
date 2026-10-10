@@ -1,6 +1,6 @@
 [Unit]
 Description=signal-cli JSON-RPC daemon
-After=network-online.target
+After=network-online.target signal-pulse.service
 Wants=network-online.target
 
 [Service]
@@ -8,8 +8,10 @@ Type=simple
 User=signal-gateway
 Group=signal-gateway
 WorkingDirectory=/var/lib/signal-cli
+Environment=XDG_RUNTIME_DIR=/run/signal-gateway
+Environment=SIGNAL_CALL_TUNNEL_BIN=/usr/local/bin/signal-call-tunnel
 EnvironmentFile=-/etc/signal-gateway.env
-ExecStart=/usr/local/bin/signal-cli --data-dir /var/lib/signal-cli daemon --http 127.0.0.1:7583 --no-receive-stdout
+ExecStart=/usr/local/bin/signal-cli --data-dir /var/lib/signal-cli daemon --http 127.0.0.1:7583 --tcp 127.0.0.1:7584 --no-receive-stdout
 Restart=always
 RestartSec=3
 
